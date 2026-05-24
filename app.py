@@ -38,148 +38,113 @@ st.set_page_config(
 # ==================== CUSTOM STYLING ====================
 CUSTOM_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css?family=Inter:wght@400;600;800&display=swap');
-
-html, body, [class*="css"] {
-  font-family: 'Inter', sans-serif !important;
-  background: linear-gradient(135deg, #f8fff8 0%, #e8fafe 100%) !important;
-  color: #22313f;
-  font-size: 17px !important;
-}
-
-.reportview-container, .main, .stApp {
-  background: transparent !important;
-}
-
-/* Sidebar improvement */
-section[data-testid="stSidebar"] {
-  background: linear-gradient(135deg, #e9f7ef 0%, #f5fcfc 100%);
-  border-right: 2px solid #76d7c4;
-}
-
-/* Card-styled tabs */
-.stTabs [data-baseweb="tab-list"] {
-  gap: 16px;
-  background: #fafffb;
-  border-radius: 18px 18px 0 0;
-  border-bottom: 2px solid #aeeace;
-  padding: 10px 24px 0 24px;
-}
-.stTabs [data-baseweb="tab"] {
-  font-size: 18px;
-  color: #217a55;
-  min-width: 180px;
-  font-weight: 500;
-}
-.stTabs [aria-selected="true"] {
-  background: #e0f7ef;
-  border-top: 3px solid #45b8ac;
-  color: #148f77;
-}
-
-/* Buttons - large, soft & animated */
-.stButton > button {
-  border-radius: 8px;
-  background: linear-gradient(90deg, #59d99d 20%, #45b8ac 90%);
-  color: white !important;
-  border: none;
-  font-weight: 700;
-  font-size: 18px;
-  box-shadow: 0 2px 18px rgba(46, 204, 113, 0.13);
-  padding: 15px 30px;
-  margin: 8px 0;
-  letter-spacing: 0.02em;
-  transition: all 0.21s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.stButton > button:hover {
-  background: linear-gradient(90deg, #2ecc71 40%, #1abc9c 100%);
-  box-shadow: 0 6px 24px rgba(46, 204, 113, 0.22);
-  transform: scale(1.035);
-}
-
-/* Metrics (calories, etc) */
-div[data-testid="metric-container"] {
-  background: #f6fcfc;
-  border: 1.5px solid #e1f5ea;
-  box-shadow: 0 2px 14px rgba(11, 201, 170, 0.025);
-  border-radius: 16px;
-  padding: 19px 10px;
-  min-height: 78px;
-  transition: box-shadow 0.3s;
-}
-div[data-testid="metric-container"]:hover {
-  background: #e3faf3;
-  border-color: #aeeace;
-}
-[data-testid="stMetricValue"] {
-  font-size: 2.0rem !important;
-  color: #38a399 !important;
-  font-weight: 800;
-}
-
-/* Tables and dataframes */
-[data-testid="stTable"] td, [data-testid="stTable"] th {
-  padding: 10px 8px !important;
-  font-size: 16px;
-}
-.stDataFrame thead tr {
-  background: #e1fbf4 !important;
-  font-weight: 700;
-}
-
-/* Input and select */
-.stTextInput > div > div > input,
-.stNumberInput > div > div > input {
-  border-radius: 9px !important;
-  border: 2px solid #aeeace !important;
-  padding: 11px 13px !important;
-  font-size: 16px !important;
-}
-.stTextInput > div > div > input:focus,
-.stNumberInput > div > div > input:focus {
-  border-color: #45b8ac !important;
-  box-shadow: 0 0 0 3px #bcf9e3 !important;
-}
-.stSelectbox > div > div {
-  padding: 8px 20px;
-  border-radius: 8px !important;
-  border: 2px solid #aeeace !important;
-  font-size: 16px !important;
-}
-
-/* Expander (encyclopedia, etc) */
-.streamlit-expanderHeader {
-  background: linear-gradient(90deg, #d7faf1 80%, #eaffee 120%);
-  color: #217a55 !important;
-  font-weight: 600;
-  border-radius: 11px 11px 0 0;
-  padding: 10px 17px;
-  font-size: 1.15em;
-}
-.streamlit-expanderContent {
-  background: #f5fcfb;
-  border-radius: 0 0 11px 11px;
-  padding: 0 15px 11px 16px;
-}
-
-/* Info and warnings */
-.stAlert {
-  border-radius: 11px !important;
-  background: rgba(52, 152, 219, 0.06);
-  border-left: 7px solid #56c596;
-  padding: 13px 17px !important;
-  font-size: 16.5px !important;
-}
-.stMarkdown h2, .stMarkdown h3, .stMarkdown h4 {
-  color: #2ecc71;
-  font-weight: 800;
-}
-
-hr {
-  margin: 2.1rem 0 !important;
-  border: none;
-  border-top: 2px dashed #A9DFBF;
-}
+    /* Primary color scheme */
+    :root {
+        --primary-color: #2ecc71;
+        --primary-hover: #27ae60;
+        --accent-color: #3498db;
+        --danger-color: #e74c3c;
+        --warning-color: #f39c12;
+    }
+    
+    /* Smooth button styling */
+    .stButton > button {
+        border-radius: 8px;
+        background-color: #2ecc71 !important;
+        color: white !important;
+        border: none;
+        padding: 12px 24px;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 8px rgba(46, 204, 113, 0.2);
+    }
+    
+    .stButton > button:hover {
+        background-color: #27ae60 !important;
+        box-shadow: 0 4px 16px rgba(46, 204, 113, 0.4);
+        transform: translateY(-2px);
+    }
+    
+    .stButton > button:active {
+        transform: translateY(0px);
+    }
+    
+    /* Metric cards - theme adaptive */
+    div[data-testid="metric-container"] {
+        background: linear-gradient(135deg, rgba(52, 152, 219, 0.08) 0%, rgba(52, 152, 219, 0.03) 100%);
+        border: 1px solid rgba(52, 152, 219, 0.2);
+        padding: 16px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    div[data-testid="metric-container"]:hover {
+        border-color: rgba(52, 152, 219, 0.4);
+        box-shadow: 0 4px 16px rgba(52, 152, 219, 0.1);
+    }
+    
+    [data-testid="stMetricValue"] {
+        font-size: 1.8rem !important;
+        color: #3498db !important;
+        font-weight: 700;
+    }
+    
+    /* Tab styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 12px;
+        background-color: transparent;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 50px;
+        border-radius: 8px 8px 0px 0px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background-color: rgba(52, 152, 219, 0.1);
+        border-top: 3px solid #3498db;
+    }
+    
+    /* Expander styling */
+    .streamlit-expanderHeader {
+        border-radius: 8px;
+    }
+    
+    /* Input field styling */
+    .stTextInput > div > div > input,
+    .stNumberInput > div > div > input {
+        border-radius: 8px !important;
+        border: 2px solid rgba(52, 152, 219, 0.2) !important;
+        padding: 10px 12px !important;
+    }
+    
+    .stTextInput > div > div > input:focus,
+    .stNumberInput > div > div > input:focus {
+        border-color: #3498db !important;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1) !important;
+    }
+    
+    /* Alert styling */
+    .stAlert {
+        border-radius: 8px;
+        padding: 12px 16px;
+    }
+    
+    /* Dataframe styling */
+    .streamlit-table {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    /* Divider */
+    hr {
+        margin: 2rem 0 !important;
+        border-color: rgba(200, 200, 200, 0.2);
+    }
 </style>
 """
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
