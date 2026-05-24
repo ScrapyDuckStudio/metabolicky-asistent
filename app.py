@@ -33,10 +33,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Načítanie USDA dát priamo z cloudu (používateľ nemusí nahrávať obrovský súbor na GitHub)
+# 2. NAČÍTANIE DÁT Z TVOJHO GITHUB-U
 @st.cache_data
 def load_data():
-    url = "https://raw.githubusercontent.com/tomas-b/public-data/main/food_data.csv"
+    # ⚠️ SEM VLOŽ SVOJU SKOPÍROVANÚ "RAW" LINKU Z KROKU 1:
+    url = "https://raw.githubusercontent.com/tomas-b/public-data/main/MyFoodData-Nutrition-Facts-SpreadSheet-Release-1-4.xlsx%20-%20SR%20Legacy%20and%20FNDDS.csv"
+    
     df = pd.read_csv(url, skiprows=3)
     df.columns = df.columns.str.strip()
     return df
@@ -44,7 +46,7 @@ def load_data():
 try:
     df = load_data()
 except Exception as e:
-    st.error("Nepodarilo sa načítať nutričnú databázu z cloudu. Skontrolujte pripojenie.")
+    st.error("Nepodarilo sa načítať súbor food_data.csv z tvojho GitHubu. Skontroluj Raw URL adresu v kóde.")
     st.stop()
 
 # --- BEZPEČNÉ UKLADANIE PRE DEPLOYMENT (Session State & Pamäť) ---
@@ -52,7 +54,6 @@ if 'daily_meals' not in st.session_state:
     st.session_state.daily_meals = []
 
 if 'cloud_history' not in st.session_state:
-    # Simulovaná cloudová história, ktorá funguje bezpečne na webe
     st.session_state.cloud_history = pd.DataFrame(
         columns=["Dátum", "Diagnózy", "Cieľ", "Váha (kg)", "Energia", "Spánok", "Kalórie", "Sacharidy (g)", "Symptómy"]
     )
