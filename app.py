@@ -3,7 +3,30 @@ import pandas as pd
 from datetime import date
 import os
 from functools import lru_cache
+import google.generativeai as genai
 
+# Configure API - Ideally use st.secrets for production
+genai.configure(api_key="YOUR_GEMINI_API_KEY")
+
+def get_smart_coach_feedback(daily_meals, health_conditions, water_intake, symptoms):
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    
+    # Construct a rich context for the AI
+    prompt = f"""
+    Act as a supportive, expert metabolic nutritionist. 
+    Analyze this daily log for a user with these conditions: {health_conditions}.
+    Daily meals: {daily_meals}.
+    Water intake: {water_intake}L.
+    Reported symptoms: {symptoms}.
+    
+    Provide 3 brief, encouraging, and evidence-based tips to improve their metabolic health 
+    for tomorrow, keeping their specific conditions in mind. Use a warm, professional tone.
+    """
+    try:
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return "Coach is currently resting. Keep up the good work!"
 # ==================== PAGE CONFIGURATION ====================
 st.set_page_config(
     page_title="Metabolický Asistent & Inteligentný Kouč",
@@ -948,6 +971,26 @@ with tab2:
         st.session_state.water_glasses = 0
         st.success(txt("save_success"))
         st.rerun()
+
+        # --- Inside TAB 2: DAILY DIARY ---
+        st.divider()
+        st.subheader("🤖 AI Smart Coach Insight")
+        
+        if st.button("Get AI Coaching Advice"):
+            with st.spinner("Analyzing your metabolism..."):
+                # Format meals for the AI
+                meals_summary = [f"{m['Jedlo']} ({m['Gramy']}g)" for m in st.session_state.daily_meals]
+                
+                # Format conditions
+                conditions = [k for k, v in health_conditions.items() if v]
+                
+                ai_advice = get_smart_coach_feedback(
+                    meals_summary, 
+                    conditions, 
+                    t_water, 
+                    s_list
+                )
+                st.info(ai_advice)
 
 # --- TAB 3: LONG-TERM PROGRESS ---
 with tab3:
