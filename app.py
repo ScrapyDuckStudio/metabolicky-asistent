@@ -803,6 +803,7 @@ with tab1:
                 st.write(txt("enc_nafld_b"))
 
 # --- TAB 2: DAILY DIARY ---
+# --- TAB 2: DAILY DIARY ---
 with tab2:
     st.header(txt("diary_hdr"))
     
@@ -971,26 +972,6 @@ with tab2:
         st.session_state.water_glasses = 0
         st.success(txt("save_success"))
         st.rerun()
-
-        # --- Inside TAB 2: DAILY DIARY ---
-        st.divider()
-        st.subheader("🤖 AI Smart Coach Insight")
-        
-        if st.button("Get AI Coaching Advice"):
-            with st.spinner("Analyzing your metabolism..."):
-                # Format meals for the AI
-                meals_summary = [f"{m['Jedlo']} ({m['Gramy']}g)" for m in st.session_state.daily_meals]
-                
-                # Format conditions
-                conditions = [k for k, v in health_conditions.items() if v]
-                
-                ai_advice = get_smart_coach_feedback(
-                    meals_summary, 
-                    conditions, 
-                    t_water, 
-                    s_list
-                )
-                st.info(ai_advice)
 
 # --- TAB 3: LONG-TERM PROGRESS ---
 with tab3:
