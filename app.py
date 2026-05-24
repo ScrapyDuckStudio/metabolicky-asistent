@@ -33,20 +33,21 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 2. NAČÍTANIE DÁT Z TVOJHO GITHUB-U
+# 2. NAČÍTANIE DÁT PRIAMO Z TVOJHO GITHUB-U
 @st.cache_data
 def load_data():
-    # ⚠️ SEM VLOŽ SVOJU SKOPÍROVANÚ "RAW" LINKU Z KROKU 1:
-    url = "https://github.com/ScrapyDuckStudio/metabolicky-asistent/blob/main/food_data.csv"
+    # Surová (Raw) linka na tvoj súbor food_data.csv
+    url = "https://raw.githubusercontent.com/ScrapyDuckStudio/metabolicky-asistent/main/food_data.csv"
     
-    df = pd.read_csv(url, skiprows=3)
+    # Načítanie dát (bez vynechávania riadkov, keďže hlavička je na začiatku)
+    df = pd.read_csv(url)
     df.columns = df.columns.str.strip()
     return df
 
 try:
     df = load_data()
 except Exception as e:
-    st.error("Nepodarilo sa načítať súbor food_data.csv z tvojho GitHubu. Skontroluj Raw URL adresu v kóde.")
+    st.error(f"Nepodarilo sa načítať súbor food_data.csv z tvojho GitHubu. Chyba: {e}")
     st.stop()
 
 # --- BEZPEČNÉ UKLADANIE PRE DEPLOYMENT (Session State & Pamäť) ---
