@@ -1062,3 +1062,60 @@ with tab3:
         st.line_chart(h_df.set_index("Dátum")["Váha (kg)"])
     else:
         st.info(txt("history_empty"))
+# --- TAB 4: NÁKUPNÝ PORADCA ---
+with tab4:
+    st.header("🛒 Nákupný poradca")
+    st.write("Potraviny vybrané na mieru tvojim diagnózam a aktuálnym deficitom:")
+
+    # Rozšírená databáza potravín s benefitmi (pridaj ich koľko chceš)
+    RECOMMENDATIONS = {
+        "Zinok": [
+            ("Tekvicové semienka", "Vysoký obsah zinku pre štítnu žľazu"),
+            ("Hovädzie mäso", "Výborný zdroj zinku a železa"),
+            ("Sezamové semienka", "Bohaté na zinok"),
+            ("Kešu orechy", "Zinok a zdravé tuky")
+        ],
+        "Železo": [
+            ("Špenát", "Vysoký obsah železa a kyseliny listovej"),
+            ("Šošovica", "Železo pre podporu pri anémii"),
+            ("Pečeň", "Najlepší zdroj vstrebateľného železa"),
+            ("Tekvicové semienka", "Kombinácia zinku a železa")
+        ],
+        "Vláknina": [
+            ("Chia semienka", "Vláknina pre inzulínovú citlivosť"),
+            ("Avokádo", "Vláknina a zdravé tuky"),
+            ("Maliny", "Nízky glykemický index, vysoká vláknina"),
+            ("Ľanové semienka", "Podpora trávenia")
+        ]
+    }
+
+    # Logika výberu
+    shopping_suggestions = []
+    
+    # Pridaj návrhy podľa deficitov
+    if has_hashi and totals["zinc"] < 11:
+        shopping_suggestions.extend(RECOMMENDATIONS["Zinok"])
+    if has_anemia and totals["iron"] < 15:
+        shopping_suggestions.extend(RECOMMENDATIONS["Železo"])
+    if (has_pcos or has_db2) and totals["fiber"] < 25:
+        shopping_suggestions.extend(RECOMMENDATIONS["Vláknina"])
+
+    # Odstránenie duplicitných návrhov
+    unique_suggestions = list(set(shopping_suggestions))
+
+    if unique_suggestions:
+        if 'shopping_list' not in st.session_state:
+            st.session_state.shopping_list = []
+
+        for food, reason in unique_suggestions:
+            col_a, col_b = st.columns([0.1, 0.9])
+            if col_a.checkbox("", key=f"chk_{food}"):
+                if food not in st.session_state.shopping_list:
+                    st.session_state.shopping_list.append(food)
+            col_b.write(f"**{food}** - *{reason}*")
+        
+        if st.button("Uložiť výber do nákupného zoznamu"):
+            st.success(f"Pridané do košíka: {', '.join(st.session_state.shopping_list)}")
+    else:
+        st.info("Momentálne nemáš žiadne výrazné deficity. Tu je zoznam 'superpotravín' pre tvoj typ diagnózy:")
+        # Tu by sme mohli vypísať všeobecné odporúčania podľa diagnóz
