@@ -835,6 +835,35 @@ with tab2:
 
         st.divider()
 
+            # ---------------------------
+    # WATER CONTROL (ALWAYS VISIBLE)
+    # ---------------------------
+    st.subheader(txt("water_hdr"))
+
+    c1, c2, c3 = st.columns(3)
+
+    with c1:
+        if st.button(f"{txt('water_intake')} 💧", use_container_width=True):
+            st.session_state.water_glasses += 1
+
+    with c2:
+        if st.button(f"➖ {txt('none')}", use_container_width=True):
+            if st.session_state.water_glasses > 0:
+                st.session_state.water_glasses -= 1
+
+    with c3:
+        if st.button(f"🔄 {txt('none')}", use_container_width=True):
+            st.session_state.water_glasses = 0
+
+    t_water = st.session_state.water_glasses * 0.25
+    st.metric(
+        txt("water_total"),
+        f"{t_water} / {target_water} L",
+        delta=f"{round(target_water - t_water, 2)} L"
+    )
+
+    st.divider()
+
         # ---------------------------
         # FEEDBACK (SINGLE SOURCE OF TRUTH)
         # ---------------------------
@@ -888,35 +917,6 @@ with tab2:
         t_water = st.session_state.water_glasses * 0.25
 
     # ---------------------------
-    # WATER CONTROL (ALWAYS VISIBLE)
-    # ---------------------------
-    st.subheader(txt("water_hdr"))
-
-    c1, c2, c3 = st.columns(3)
-
-    with c1:
-        if st.button(f"{txt('water_intake')} 💧", use_container_width=True):
-            st.session_state.water_glasses += 1
-
-    with c2:
-        if st.button(f"➖ {txt('none')}", use_container_width=True):
-            if st.session_state.water_glasses > 0:
-                st.session_state.water_glasses -= 1
-
-    with c3:
-        if st.button(f"🔄 {txt('none')}", use_container_width=True):
-            st.session_state.water_glasses = 0
-
-    t_water = st.session_state.water_glasses * 0.25
-    st.metric(
-        txt("water_total"),
-        f"{t_water} / {target_water} L",
-        delta=f"{round(target_water - t_water, 2)} L"
-    )
-
-    st.divider()
-
-    # ---------------------------
     # SYMPTOMS
     # ---------------------------
     st.subheader(txt("symptoms_hdr"))
@@ -946,31 +946,6 @@ with tab2:
         st.markdown(txt("sym_subjective"))
         energy_score = st.slider(txt("sym_energy"), 1, 10, 7, key="energy")
         sleep_score = st.slider(txt("sym_sleep"), 1, 10, 7, key="sleep")
-
-    # ---------------------------
-    # METABOLISM STATUS
-    # ---------------------------
-    status_emoji, status_msg = get_metabolism_status(
-        t_cal if st.session_state.daily_meals else 0,
-        target_cal,
-        t_carbs if st.session_state.daily_meals else 0,
-        target_carbs,
-        t_prot if st.session_state.daily_meals else 0,
-        target_protein,
-        t_fiber if st.session_state.daily_meals else 0,
-        has_pcos,
-        has_hashi,
-        t_iron if st.session_state.daily_meals else 0,
-        t_zinc if st.session_state.daily_meals else 0,
-        t_risks if st.session_state.daily_meals else 0,
-        t_water,
-        target_water
-    )
-
-    st.markdown(txt("metabolism_status"))
-    st.markdown(f"### {status_emoji} {status_msg}")
-
-    st.write("")
 
     # ---------------------------
     # SAVE
