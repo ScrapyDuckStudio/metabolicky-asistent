@@ -182,32 +182,49 @@ TXT = {
 HIST_COLS = ["Dátum", "Diagnózy", "Cieľ", "Váha (kg)", "Energia", "Spánok", "Kalórie", "Sacharidy (g)", "Symptómy"]
 
 # --- NAČÍTANIE DATABÁZY POTRAVÍN ---
+# --- NAČÍTANIE DATABÁZY POTRAVÍN ---
 @st.cache_data
-def load_data():
-    # Načítanie tvojho reálneho súboru s preskočením úvodných riadkov MyFoodData
+def load_data(uploaded_file):
+    # Ak používateľ nahral súbor cez webové rozhranie
+    if uploaded_file is not None:
+        try:
+            df = pd.read_csv(uploaded_file, skiprows=3)
+            df.columns = df.columns.str.strip()
+            return df
+        except Exception as e:
+            st.error(f"Chyba pri spracovaní nahraného súboru: {e}")
+    
+    # Skúška, či súbor neexistuje lokálne na serveri/disku
     file_name = "food_data_en_sk.csv"
-    try:
-        df = pd.read_csv(file_name, skiprows=3)
-        df.columns = df.columns.str.strip()
-        return df
-    except Exception as e:
-        st.error(f"Nepodarilo sa načítať súbor {file_name}: {e}")
-        # Záložné mock dáta so zhodnou štruktúrou stĺpcov, ak by súbor chýbal
-        return pd.DataFrame({
-            'ID': [1, 2, 3],
-            'name_en': ['Oats', 'Spinach', 'Beef'],
-            'name_sk': ['Ovsene vlocky', 'Spenat', 'Hovadzie maso'],
-            'Calories': [389, 23, 250],
-            'Protein (g)': [16.9, 2.9, 26.0],
-            'Fat (g)': [6.9, 0.4, 15.0],
-            'Net-Carbs (g)': [66.3, 1.4, 0.0],
-            'Sugars (g)': [0.0, 0.4, 0.0],
-            'Fiber (g)': [10.6, 2.2, 0.0],
-            'Iron, Fe (mg)': [4.7, 2.7, 2.6],
-            'Zinc, Zn (mg)': [4.0, 0.5, 4.3]
-        })
+    if os.path.exists(file_name):
+        try:
+            df = pd.read_csv(file_name, skiprows=3)
+            df.columns = df.columns.str.strip()
+            return df
+        except Exception:
+            pass
+            
+    # Záložné mock dáta, ak súbor úplne chýba
+    return pd.DataFrame({
+        'ID': [1, 2, 3],
+        'name_en': ['Oats', 'Spinach', 'Beef'],
+        'name_sk': ['Ovsené vločky', 'Špenát', 'Hovädzie mäso'],
+        'Calories': [389, 23, 250],
+        'Protein (g)': [16.9, 2.9, 26.0],
+        'Fat (g)': [6.9, 0.4, 15.0],
+        'Net-Carbs (g)': [66.3, 1.4, 0.0],
+        'Sugars (g)': [0.0, 0.4, 0.0],
+        'Fiber (g)': [10.6, 2.2, 0.0],
+        'Iron, Fe (mg)': [4.7, 2.7, 2.6],
+        'Zinc, Zn (mg)': [4.0, 0.5, 4.3]
+    })
 
-df = load_data()
+# Pridanie widgetu na nahranie súboru na začiatok hlavnej stránky
+st.subheader("📁 Nahrávenie databázy potravín")
+uploaded_file = st.file_uploader("Nahraj súbor food_data_en_sk.csv", type=["csv"])
+
+# Načítanie dát s odovzdaním nahraného súboru
+df = load_data(uploaded_file)
 
 if 'daily_meals' not in st.session_state:
     st.session_state.daily_meals = []
