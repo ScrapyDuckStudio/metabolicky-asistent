@@ -807,147 +807,172 @@ with tab1:
    # --- TAB 2: DAILY DIARY ---
 with tab2:
     st.header(txt("diary_hdr"))
-    
+
     if st.session_state.daily_meals:
+
+        # ---------------------------
+        # DATA PREP
+        # ---------------------------
         df_today = pd.DataFrame(st.session_state.daily_meals)
+
         df_display = df_today.copy()
-        
+
         lang = get_lang()
         if lang == "SK":
-            df_display.columns = ["Jedlo", "Gramy", "Kalórie", "Bielkoviny", "Tuky", "Čisté Sacharidy", "Cukor", "Vláknina", "Železo", "Zinok", "Riziko"]
+            df_display.columns = [
+                "Jedlo", "Gramy", "Kalórie", "Bielkoviny", "Tuky",
+                "Čisté Sacharidy", "Cukor", "Vláknina", "Železo",
+                "Zinok", "Riziko"
+            ]
         else:
-            df_display.columns = ["Food", "Grams", "Calories", "Protein", "Fat", "Net Carbs", "Sugar", "Fiber", "Iron", "Zinc", "Risk"]
-        
+            df_display.columns = [
+                "Food", "Grams", "Calories", "Protein", "Fat",
+                "Net Carbs", "Sugar", "Fiber", "Iron",
+                "Zinc", "Risk"
+            ]
+
         st.dataframe(df_display.iloc[:, :8], use_container_width=True)
-        
-        # Calculate totals
-        t_cal = df_today["Kalórie"].sum()
-        t_carbs = df_today["Čisté Sacharidy"].sum()
-        t_prot = df_today["Bielkoviny"].sum()
-        t_sugar = df_today["Cukor"].sum()
-        t_fiber = df_today["Vláknina"].sum()
-        t_iron = df_today["Železo"].sum()
-        t_zinc = df_today["Zinok"].sum()
-        t_risks = df_today["Rizikové"].sum()
-        
-        # Status
+
+        # ---------------------------
+        # TOTALS (safe)
+        # ---------------------------
+        t_cal = df_today.get("Kalórie", pd.Series([0])).sum()
+        t_carbs = df_today.get("Čisté Sacharidy", pd.Series([0])).sum()
+        t_prot = df_today.get("Bielkoviny", pd.Series([0])).sum()
+        t_sugar = df_today.get("Cukor", pd.Series([0])).sum()
+        t_fiber = df_today.get("Vláknina", pd.Series([0])).sum()
+        t_iron = df_today.get("Železo", pd.Series([0])).sum()
+        t_zinc = df_today.get("Zinok", pd.Series([0])).sum()
+        t_risks = df_today.get("Riziko", pd.Series([0])).sum()
+
+        # ---------------------------
+        # STATUS METRICS
+        # ---------------------------
         st.markdown(txt("status"))
         c1, c2, c3, c4 = st.columns(4)
+
         c1.metric(txt("cal"), f"{round(t_cal)} / {target_cal} kcal")
         c2.metric(txt("prot"), f"{round(t_prot, 1)} / {target_protein} g")
         c3.metric(txt("carbs"), f"{round(t_carbs, 1)} / {target_carbs} g")
         c4.metric(txt("fiber"), f"{round(t_fiber, 1)} g")
-        
+
         st.divider()
 
-        # --- AI INTEGRÁCIA ---
+        # ---------------------------
+        # AI COACHING
+        # ---------------------------
         st.subheader("🤖 AI Coaching Advice")
+
         if st.button("Get AI Coaching Advice"):
             with st.spinner("AI asistent analyzuje tvoj metabolický profil..."):
-                # Príprava kontextu pre AI
-                meals_summary = [f"{m['Jedlo']} ({m['Gramy']}g)" for m in st.session_state.daily_meals]
+
+                meals_summary = [
+                    f"{m.get('Jedlo','?')} ({m.get('Gramy',0)}g)"
+                    for m in st.session_state.daily_meals
+                ]
+
                 conditions = [k for k, v in health_conditions.items() if v]
-                
-                # Volanie funkcie (uistite sa, že funkcia je definovaná v hornej časti súboru)
+
                 advice = get_smart_coach_feedback(
-                    daily_meals=meals_summary, 
-                    health_conditions=conditions, 
-                    water_intake=st.session_state.water_glasses * 0.25, 
-                    symptoms=",".join(s_list) if 's_list' in locals() else "None"
+                    daily_meals=meals_summary,
+                    health_conditions=conditions,
+                    water_intake=st.session_state.water_glasses * 0.25,
+                    symptoms=",".join(s_list) if "s_list" in locals() else "None"
                 )
+
                 st.info(advice)
-        
+
         st.divider()
-        st.subheader(txt("feedback_hdr"))
-        
-        # Logika pre existujúce spätné väzby
+
+        # ---------------------------
+        # FEEDBACK (SINGLE SOURCE OF TRUTH)
+        # ---------------------------
         feedbacks = []
+
         if has_pcos or has_db2:
-            feedbacks.append(txt("fb_pcos_fiber_low") if t_fiber < 25 else txt("fb_pcos_fiber_ok"))
+            feedbacks.append(
+                txt("fb_pcos_fiber_low") if t_fiber < 25 else txt("fb_pcos_fiber_ok")
+            )
+
         if (has_pcos or has_db2 or has_nafld) and t_sugar > 35:
             feedbacks.append(txt("fb_pcos_sugar_high"))
+
         if has_anemia:
-            feedbacks.append(txt("fb_anemia_iron_low").format(iron=round(t_iron, 1)) if t_iron < 15 else txt("fb_anemia_iron_ok"))
-        if has_hashi:
-            if t_zinc < 11: feedbacks.append(txt("fb_hashi_zinc_low").format(zinc=round(t_zinc, 1)))
-            if t_risks > 0: feedbacks.append(txt("fb_hashi_risks").format(risks=int(t_risks)))
-        if has_celiakia and t_risks > 0: feedbacks.append(txt("fb_celiakia_risk"))
-        if has_gastritis and t_risks > 0: feedbacks.append(txt("fb_gastritis_risk"))
-        if has_gout and t_risks > 0: feedbacks.append(txt("fb_gout_risk"))
-        
-        # Hydratácia
-        t_water = st.session_state.water_glasses * 0.25
-        feedbacks.append(txt("fb_water_low").format(target=target_water) if t_water < target_water * 0.8 else txt("fb_water_ok"))
-        
-        for feedback in feedbacks:
-            st.info(feedback)
-    else:
-        st.info(txt("no_meals"))
-    
-    st.divider()
-    # ... (ostatné časti kódu pre vodu a symptómy zostávajú nezmenené)
-        
-        # Generate feedback
-        feedbacks = []
-        if has_pcos or has_db2:
-            if t_fiber < 25:
-                feedbacks.append(txt("fb_pcos_fiber_low"))
-            else:
-                feedbacks.append(txt("fb_pcos_fiber_ok"))
-        if (has_pcos or has_db2 or has_nafld) and t_sugar > 35:
-            feedbacks.append(txt("fb_pcos_sugar_high"))
-        if has_anemia:
-            if t_iron < 15:
-                feedbacks.append(txt("fb_anemia_iron_low").format(iron=round(t_iron, 1)))
-            else:
-                feedbacks.append(txt("fb_anemia_iron_ok"))
+            feedbacks.append(
+                txt("fb_anemia_iron_low").format(iron=round(t_iron, 1))
+                if t_iron < 15 else txt("fb_anemia_iron_ok")
+            )
+
         if has_hashi:
             if t_zinc < 11:
                 feedbacks.append(txt("fb_hashi_zinc_low").format(zinc=round(t_zinc, 1)))
             if t_risks > 0:
                 feedbacks.append(txt("fb_hashi_risks").format(risks=int(t_risks)))
+
         if has_celiakia and t_risks > 0:
             feedbacks.append(txt("fb_celiakia_risk"))
+
         if has_gastritis and t_risks > 0:
             feedbacks.append(txt("fb_gastritis_risk"))
+
         if has_gout and t_risks > 0:
             feedbacks.append(txt("fb_gout_risk"))
-        if st.session_state.water_glasses * 0.25 < target_water * 0.8:
-            feedbacks.append(txt("fb_water_low").format(target=target_water))
-        else:
-            feedbacks.append(txt("fb_water_ok"))
-        
-        if not feedbacks:
-            st.success(txt("fb_perfect"))
-        else:
-            for feedback in feedbacks:
-                st.info(feedback)
+
+        # water
+        t_water = st.session_state.water_glasses * 0.25
+        feedbacks.append(
+            txt("fb_water_low").format(target=target_water)
+            if t_water < target_water * 0.8 else txt("fb_water_ok")
+        )
+
+        for f in feedbacks:
+            st.info(f)
+
+        st.divider()
+
     else:
         st.info(txt("no_meals"))
-    
-    st.divider()
+
+        # still show water + symptoms even without meals
+        t_water = st.session_state.water_glasses * 0.25
+
+    # ---------------------------
+    # WATER CONTROL (ALWAYS VISIBLE)
+    # ---------------------------
     st.subheader(txt("water_hdr"))
-    
-    water_col1, water_col2, water_col3 = st.columns(3)
-    with water_col1:
+
+    c1, c2, c3 = st.columns(3)
+
+    with c1:
         if st.button(f"{txt('water_intake')} 💧", use_container_width=True):
             st.session_state.water_glasses += 1
-    with water_col2:
+
+    with c2:
         if st.button(f"➖ {txt('none')}", use_container_width=True):
             if st.session_state.water_glasses > 0:
                 st.session_state.water_glasses -= 1
-    with water_col3:
+
+    with c3:
         if st.button(f"🔄 {txt('none')}", use_container_width=True):
             st.session_state.water_glasses = 0
-    
+
     t_water = st.session_state.water_glasses * 0.25
-    st.metric(txt("water_total"), f"{t_water} / {target_water} L", delta=f"{round(target_water - t_water, 2)} L")
-    
+    st.metric(
+        txt("water_total"),
+        f"{t_water} / {target_water} L",
+        delta=f"{round(target_water - t_water, 2)} L"
+    )
+
     st.divider()
+
+    # ---------------------------
+    # SYMPTOMS
+    # ---------------------------
     st.subheader(txt("symptoms_hdr"))
+
     s_cols = st.columns(3)
     s_list = []
-    
+
     with s_cols[0]:
         st.markdown(txt("sym_gain_fatigue"))
         if st.checkbox(txt("sym_hunger"), key="hunger"):
@@ -956,7 +981,7 @@ with tab2:
             s_list.append("Weakness")
         if st.checkbox(txt("sym_bloating"), key="bloating"):
             s_list.append("Bloating")
-    
+
     with s_cols[1]:
         st.markdown(txt("sym_lose_weight"))
         if st.checkbox(txt("sym_palpitations"), key="palpitations"):
@@ -965,43 +990,50 @@ with tab2:
             s_list.append("Cramps")
         if st.checkbox(txt("sym_gout_pain"), key="gout_pain"):
             s_list.append("Gout Pain")
-    
+
     with s_cols[2]:
         st.markdown(txt("sym_subjective"))
         energy_score = st.slider(txt("sym_energy"), 1, 10, 7, key="energy")
         sleep_score = st.slider(txt("sym_sleep"), 1, 10, 7, key="sleep")
-    
-    st.write("")
-    
-    # Metabolism status
+
+    # ---------------------------
+    # METABOLISM STATUS
+    # ---------------------------
     status_emoji, status_msg = get_metabolism_status(
         t_cal if st.session_state.daily_meals else 0,
-        target_cal, t_carbs if st.session_state.daily_meals else 0, target_carbs,
-        t_prot if st.session_state.daily_meals else 0, target_protein,
-        t_fiber if st.session_state.daily_meals else 0, has_pcos, has_hashi,
-        t_iron if st.session_state.daily_meals else 0, t_zinc if st.session_state.daily_meals else 0,
-        t_risks if st.session_state.daily_meals else 0, t_water, target_water
+        target_cal,
+        t_carbs if st.session_state.daily_meals else 0,
+        target_carbs,
+        t_prot if st.session_state.daily_meals else 0,
+        target_protein,
+        t_fiber if st.session_state.daily_meals else 0,
+        has_pcos,
+        has_hashi,
+        t_iron if st.session_state.daily_meals else 0,
+        t_zinc if st.session_state.daily_meals else 0,
+        t_risks if st.session_state.daily_meals else 0,
+        t_water,
+        target_water
     )
-    
+
     st.markdown(txt("metabolism_status"))
     st.markdown(f"### {status_emoji} {status_msg}")
-    
+
     st.write("")
+
+    # ---------------------------
+    # SAVE
+    # ---------------------------
     if st.button(txt("save_btn"), use_container_width=True, type="primary"):
+
         diag_list = []
-        if has_pcos:
-            diag_list.append("PCOS")
-        if has_hashi:
-            diag_list.append("Hashimoto")
-        if has_anemia:
-            diag_list.append("Anemia")
-        if has_celiakia:
-            diag_list.append("Celiac")
-        if has_gout:
-            diag_list.append("Gout")
-        if has_nafld:
-            diag_list.append("NAFLD")
-        
+        if has_pcos: diag_list.append("PCOS")
+        if has_hashi: diag_list.append("Hashimoto")
+        if has_anemia: diag_list.append("Anemia")
+        if has_celiakia: diag_list.append("Celiac")
+        if has_gout: diag_list.append("Gout")
+        if has_nafld: diag_list.append("NAFLD")
+
         row_data = {
             "Dátum": str(date.today()),
             "Diagnózy": ", ".join(diag_list) if diag_list else "None",
@@ -1014,12 +1046,14 @@ with tab2:
             "Voda (L)": t_water,
             "Symptómy": ", ".join(s_list) if s_list else "None"
         }
+
         save_history_row(row_data)
+
         st.session_state.daily_meals = []
         st.session_state.water_glasses = 0
+
         st.success(txt("save_success"))
         st.rerun()
-
 # --- TAB 3: LONG-TERM PROGRESS ---
 with tab3:
     st.header(txt("history_hdr"))
