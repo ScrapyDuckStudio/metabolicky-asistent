@@ -804,7 +804,6 @@ with tab1:
 
 # --- TAB 2: DAILY DIARY ---
 # --- TAB 2: DAILY DIARY ---
-with tab2:
    # --- TAB 2: DAILY DIARY ---
 with tab2:
     st.header(txt("diary_hdr"))
