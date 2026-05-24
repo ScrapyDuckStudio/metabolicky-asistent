@@ -7,30 +7,14 @@ import os
 st.set_page_config(page_title="Metabolický Asistent & Inteligentný Kouč", layout="wide", page_icon="🩺")
 
 # --- CUSTOM CSS (VIZUÁLNE VYLEPŠENIA) ---
+# --- CUSTOM CSS (VIZUÁLNE VYLEPŠENIA - THEME ADAPTIVE) ---
 custom_css = """
 <style>
-    /* Main background */
-    .stApp {
-        background-color: #f4f7f6;
-    }
-    
-    /* Sidebar */
-    [data-testid="stSidebar"] {
-        background-color: #ffffff;
-        border-right: 1px solid #e0e6ed;
-    }
-    
-    /* Headers */
-    h1, h2, h3, h4 {
-        color: #2c3e50;
-        font-family: 'Inter', 'Segoe UI', sans-serif;
-    }
-    
     /* Buttons */
     .stButton>button {
         border-radius: 8px;
         background-color: #2ecc71;
-        color: white;
+        color: white !important;
         border: none;
         padding: 10px 24px;
         font-weight: 600;
@@ -39,54 +23,37 @@ custom_css = """
     .stButton>button:hover {
         background-color: #27ae60;
         box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
-        color: white;
+        color: white !important;
     }
     
-    /* Metrics / Cards */
+    /* Metrics / Cards - Adapts to Dark/Light Mode */
     div[data-testid="metric-container"] {
-        background-color: #ffffff;
-        border: 1px solid #e0e6ed;
+        background-color: rgba(127, 140, 141, 0.1); /* Transparent grey */
+        border: 1px solid rgba(127, 140, 141, 0.2);
         padding: 15px;
         border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.04);
         text-align: center;
     }
     [data-testid="stMetricValue"] {
         font-size: 1.8rem;
-        color: #2980b9;
+        color: #3498db !important; /* Medical blue */
         font-weight: bold;
     }
-    [data-testid="stMetricLabel"] {
-        font-size: 1rem;
-        color: #7f8c8d;
-    }
     
-    /* Tabs */
+    /* Tabs - Adapts to Dark/Light Mode */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
         background-color: transparent;
     }
     .stTabs [data-baseweb="tab"] {
         height: 50px;
-        background-color: #ffffff;
         border-radius: 8px 8px 0px 0px;
         padding: 10px 20px;
-        color: #34495e;
-        border: 1px solid #e0e6ed;
-        border-bottom: none;
         font-weight: 500;
     }
     .stTabs [aria-selected="true"] {
-        background-color: #e8f4f8;
+        background-color: rgba(52, 152, 219, 0.1);
         border-top: 3px solid #3498db;
-        color: #2980b9;
-    }
-    
-    /* Expanders */
-    .streamlit-expanderHeader {
-        background-color: #ffffff;
-        border-radius: 8px;
-        border: 1px solid #e0e6ed;
     }
 </style>
 """
