@@ -3,44 +3,28 @@ import pandas as pd
 from datetime import date
 import os
 
-# --- 1. CONFIG & APP NASTAVENIE ---
-st.set_page_config(
-    page_title="Metabolický Asistent Pro",
-    page_icon="🧬",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-# Custom štýl pre krajšie vizuálne rozhranie
-st.markdown("""
-    <style>
-    .reportview-container { background: #f5f7f9; }
-    .stMetric { background-color: #ffffff; padding: 15px; border-radius: 10px; border: 1px solid #e6ebf1; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-    .stActionButton { background-color: #2e7d32; color: white; }
-    </style>
-""", unsafe_allow_html=True)
+# --- NASTAVENIE STRÁNKY ---
+st.set_page_config(page_title="Metabolický Asistent & Inteligentný Kouč", layout="wide")
 
 HISTORY_FILE = "zdravotna_historia_global.csv"
-HIST_COLS = ["Dátum", "Diagnózy", "Cieľ", "Váha (kg)", "Energia", "Spánok", "Kalórie", "Sacharidy (g)", "Symptómy", "Rizika_Pocet"]
 
-# --- 2. JAZYKOVÁ MUTÁCIA ---
+# --- JAZYKOVÝ SLOVNÍK ---
 lang = st.sidebar.radio("🌐 Jazyk / Language", ["SK", "EN"])
 
 TXT = {
     "SK": {
-        "title": "🧬 Inteligentný Metabolický & Hormonálny Tracker",
-        "subtitle": "Personalizovaný biohacking a nutričná diagnostika na základe tvojho metabolického profilu.",
-        "profile": "🧬 Krok 1: Tvoj zdravotný profil",
-        "gain_weight_tendency": "📉 Sklon k priberaniu / Blokované chudnutie:",
+        "title": "🩺 Inteligentný Metabolický & Hormonálny Tracker Pro",
+        "profile": "🧬 Krok 1: Zdravotný profil",
+        "gain_weight_tendency": "📉 Sklon k priberaniu / Blokácia chudnutia:",
         "pcos": "PCOS (Inzulínová rezistencia)",
         "hashi": "Hashimoto (Spomalený metabolizmus)",
-        "db2": "Cukrovka 2. typu",
+        "db2": "Cukrovka 2. types",
         "anemia": "Anémia (Nedostatok železa)",
         "cushing": "Cushingov syndróm (Vysoký kortizol)",
         "lepid": "Lipedém / Lymfedém",
         "lose_weight_tendency": "📈 Sklon k chudnutiu / Problém pribrať:",
         "hyper": "Hypertyreóza (Zrýchlený metabolizmus)",
-        "celiakia": "Celiakia / IBD (Zápal čriev)",
+        "celiakia": "Celiakia / IBD (Porucha vstrebávania)",
         "addison": "Addisonova choroba",
         "digestion": "🍽️ Tráviace citlivosti & Intolerancie:",
         "hit": "HIT (Histamínová intolerancia)",
@@ -53,62 +37,61 @@ TXT = {
         "hypertension": "Hypertenzia (Vysoký tlak)",
         "kidney_stones": "Obličkové kamene",
         
-        "goal_hdr": "🎯 Krok 2: Stanovenie cieľa",
-        "goal_q": "Čo je tvojou prioritou?",
-        "goals": ["Zdravé chudnutie", "Udržanie váhy & Regenerácia", "Budovanie hmoty / Pribratie"],
+        "goal_hdr": "🎯 Krok 2: Tvoj cieľ",
+        "goal_q": "Čo chceš dosiahnuť?",
+        "goals": ["Zdravé chudnutie", "Udržanie váhy & Regenerácia", "Zdravé pribratie"],
         
-        "antropo": "👤 Krok 3: Antropometrické údaje",
-        "weight": "Aktuálna váha (kg):",
+        "antropo": "👤 Krok 3: Tvoje údaje",
+        "weight": "Váha (kg):",
         "height": "Výška (cm):",
         "age": "Vek:",
-        "target_info": "🎯 **Tvoj denný metabolický plán:**\n* 🔥 **Kalórie:** `{cal}` kcal\n* 🥩 **Bielkoviny:** `{prot}` g\n* 🥑 **Tuky:** `{fat}` g\n* 🌾 **Čisté sacharidy:** `{carbs}` g\n* 💧 **Voda:** `{water:.2f}` L",
+        "target_info": "🎯 **Optimálne cieľové makrá:**\n* 🔥 **Kalórie:** {cal} kcal\n* 🥩 **Bielkoviny:** {prot} g\n* 🥑 **Tuky:** {fat} g\n* 🌾 **Čisté sacharidy:** {carbs} g\n* 💧 **Pitný režim:** {water:.2f} L",
         
-        "tabs": ["🍽️ Potravinový Asistent", "📊 Denník & Diagnostika", "📈 Korelácie & Vývoj", "🛒 Inteligentný Nákupný Zoznam"],
-        "search_hdr": "🔍 Vyhľadávanie potravín",
-        "search_lbl": "Zadaj názov jedla (napr. hovädzie, špenát, beef, oats):",
-        "select_food": "Vyber presnú položku z databázy:",
-        "grams": "Zadaj množstvo (g):",
-        "analysis": "#### 📊 Nutričné hodnoty porcie ({g}g):",
+        "tabs": ["🍽️ Potravinový asistent", "📊 Dnešný denník & Diagnostika", "📈 Korelácie & Vývoj", "🛒 Nákupný košík na mieru"],
+        "search_hdr": "🔍 Vyhľadať a analyzovať jedlo",
+        "search_lbl": "Zadaj názov potraviny (napr. hovädzie, špenát, beef):",
+        "select_food": "Vyber presnú potravinu:",
+        "grams": "Množstvo v gramoch (g):",
+        "analysis": "#### 📊 Nutričná analýza porcie ({g}g):",
         "cal": "Kalórie",
         "prot": "Bielkoviny",
         "carbs": "Sacharidy",
         "fiber": "Vláknina",
         
-        "warnings_hdr": "⚠️ Metabolické upozornenia pre tvoj profil:",
-        "warn_gluten": "🌾 **Obsahuje LEPOK:** Riziko zápalovej imunitnej reakcie.",
-        "warn_milk": "🥛 **Mliečne výrobky/Sója:** Možný strumigénny blokátor pre štítnu žľazu.",
-        "warn_hit": "⚠️ **Vysoký Histamín:** Potenciálny spúšťač kožnej alebo tráviacej reakcie.",
-        "warn_gastritis": "🔥 **Žalúdočný iritant:** Môže dráždiť sliznicu žalúdka a zvýšiť kyselinu.",
-        "warn_sugar": "🚨 **Vysoká glykemická záťaž:** Riziko inzulínovej špičky.",
-        "warn_purines": "🥩 **Vysoký obsah purínov:** Nevhodné pri zvýšenej kyseline močovej.",
-        "warn_oxalates": "🌱 **Vysoké oxaláty:** Zvyšuje riziko kalcifikácie obličiek.",
-        "warn_high_fat": "🧈 **Vysoký obsah tukov:** Nadmerná záťaž na žlčník a pečeň.",
+        "warnings_hdr": "### 🚨 Zdravotné varovania pre toto jedlo:",
+        "warn_gluten": "🌾 **LEPOK / GLUTEN:** Riziko zápalu čriev pre celiatika.",
+        "warn_milk": "🥛 **Mlieko/Sója:** Možný skrížený strumigén pre štítnu žľazu (Hashimoto).",
+        "warn_hit": "⚠️ **Vysoký Histamín:** Pozor na uvoľnenie histamínu u HIT.",
+        "warn_gastritis": "🔥 **Iritant žalúdka:** Môže vyvolať pálenie záhy alebo bolesť.",
+        "warn_sugar": "🚨 **Vysoký cukor:** Nevhodné pre inzulínovú rezistenciu.",
+        "warn_purines": "🥩 **Vysoké puríny:** Riziko záchvatu dny.",
+        "warn_oxalates": "🌱 **Vysoké oxaláty:** Podporuje tvorbu obličkových kameňov.",
+        "warn_high_fat": "🧈 **Vysoký tuk:** Záťaž pre žlčník a stukovatenú pečeň.",
         
-        "add_btn": "➕ Pridať do dnešného dňa",
-        "add_success": "Potravina bola úspešne zapísaná.",
-        "not_found": "Potravina sa nenašla. Skús iný výraz.",
+        "add_btn": "➕ Pridať do denného záznamu",
+        "add_success": "Jedlo bolo úspešne pridané.",
+        "not_found": "Potravina sa v databáze nenašla.",
         
-        "diary_hdr": "📊 Dnešný denník",
-        "status": "#### Celková bilancia dňa:",
-        "feedback_hdr": "💬 Automatická klinická spätná väzba",
-        "save_btn": "💾 Uzatvoriť a bezpečne uložiť deň",
-        "save_success": "Dáta boli úspešne zapísané do cloudu.",
-        "no_meals": "Zatiaľ žiadne záznamy. Použi kartu 'Potravinový Asistent'.",
+        "diary_hdr": "📊 Denný prehľad a bio-spätná väzba",
+        "status": "#### Sumár skonzumovaných živín:",
+        "feedback_hdr": "💬 Inteligentné vyhodnotenie dňa",
+        "save_btn": "💾 Uzatvoriť a uložiť dnešný deň",
+        "save_success": "Deň bol úspešne zapísaný do histórie!",
+        "no_meals": "Dnes si zatiaľ nič nezjedol.",
         
-        "symptoms_hdr": "🩺 Sledovanie bio-symptómov",
-        "sym_energy": "Energia počas dňa (1-10):",
+        "symptoms_hdr": "🩺 Ako sa dnes cíti tvoje telo?",
+        "sym_energy": "Energia (1-10):",
         "sym_sleep": "Kvalita spánku (1-10):",
-        "history_hdr": "📈 Vývoj a hľadanie skrytých príčin",
-        "history_empty": "Zatiaľ žiadne historické dáta.",
-        "superfoods_hdr": "🛒 Tvoj liečebný nákupný zoznam",
-        "superfoods_desc": "Tieto potraviny pôsobia ako funkčná medicína pre tvoj aktuálny stav:",
-        "db_status_ok": "✅ Databáza plne funkčná."
+        "history_hdr": "📈 Analýza dlhodobých trendov a korelácií",
+        "history_empty": "História je zatiaľ prázdna. Ulož si prvý deň.",
+        "superfoods_hdr": "🛒 Odporúčaný nákupný zoznam pre tvoje telo",
+        "superfoods_desc": "Tieto potraviny aktívne pomáhajú liečiť tvoje vybrané symptómy a diagnózy:",
+        "db_status_ok": "✅ Databáza potravín je aktívna."
     },
     "EN": {
-        "title": "🧬 Smart Metabolic & Hormonal Tracker",
-        "subtitle": "Personalized biohacking and nutritional diagnostics based on your unique metabolic profile.",
-        "profile": "🧬 Step 1: Your Health Profile",
-        "gain_weight_tendency": "📉 Weight Gain / Blocked Weight Loss:",
+        "title": "🩺 Smart Metabolic & Hormonal Tracker Pro",
+        "profile": "🧬 Step 1: Health Profile",
+        "gain_weight_tendency": "📉 Weight Gain / Weight Loss Block:",
         "pcos": "PCOS (Insulin Resistance)",
         "hashi": "Hashimoto (Slow Metabolism)",
         "db2": "Type 2 Diabetes",
@@ -130,84 +113,82 @@ TXT = {
         "hypertension": "Hypertension (High BP)",
         "kidney_stones": "Kidney Stones",
         
-        "goal_hdr": "🎯 Step 2: Goal Setting",
-        "goal_q": "What is your priority?",
-        "goals": ["Healthy Weight Loss", "Maintenance & Recovery", "Weight Gain / Bulking"],
+        "goal_hdr": "🎯 Step 2: Your Goal",
+        "goal_q": "What is your goal?",
+        "goals": ["Healthy Weight Loss", "Maintenance & Recovery", "Healthy Weight Gain"],
         
-        "antropo": "👤 Step 3: Body Metrics",
-        "weight": "Current Weight (kg):",
+        "antropo": "👤 Step 3: Your Data",
+        "weight": "Weight (kg):",
         "height": "Height (cm):",
         "age": "Age:",
-        "target_info": "🎯 **Your Daily Metabolic Blueprint:**\n* 🔥 **Calories:** `{cal}` kcal\n* 🥩 **Protein:** `{prot}` g\n* 🥑 **Fat:** `{fat}` g\n* 🌾 **Net Carbs:** `{carbs}` g\n* 💧 **Water:** `{water:.2f}` L",
+        "target_info": "🎯 **Optimal Target Macros:**\n* 🔥 **Calories:** {cal} kcal\n* 🥩 **Protein:** {prot} g\n* 🥑 **Fat:** {fat} g\n* 🌾 **Net Carbs:** {carbs} g\n* 💧 **Water Intake:** {water:.2f} L",
         
         "tabs": ["🍽️ Food Assistant", "📊 Diary & Diagnostics", "📈 Correlations & Trends", "🛒 Tailored Shopping List"],
-        "search_hdr": "🔍 Search Foods",
-        "search_lbl": "Enter food name (e.g. beef, spinach, oats):",
-        "select_food": "Select exact item from database:",
-        "grams": "Enter weight (g):",
-        "analysis": "#### 📊 Nutritional Value of Portion ({g}g):",
+        "search_hdr": "🔍 Search and Analyze Food",
+        "search_lbl": "Enter food name (e.g. beef, spinach):",
+        "select_food": "Select exact food:",
+        "grams": "Amount in grams (g):",
+        "analysis": "#### 📊 Nutritional Analysis of Portion ({g}g):",
         "cal": "Calories",
         "prot": "Protein",
         "carbs": "Carbs",
         "fiber": "Fiber",
         
-        "warnings_hdr": "⚠️ Metabolic Alerts for Your Profile:",
-        "warn_gluten": "🌾 **Contains GLUTEN:** Risk of inflammatory immune response.",
-        "warn_milk": "🥛 **Dairy/Soy:** Potential goitrogenic blocker for the thyroid.",
-        "warn_hit": "⚠️ **High Histamine:** Potential trigger for skin or digestive reaction.",
-        "warn_gastritis": "🔥 **Stomach Irritant:** May irritate stomach lining and increase acid.",
-        "warn_sugar": "🚨 **High Glycemic Load:** Risk of insulin spike.",
-        "warn_purines": "🥩 **High Purines:** Not suitable for high uric acid levels.",
-        "warn_oxalates": "🌱 **High Oxalates:** Increases risk of kidney calcification.",
-        "warn_high_fat": "🧈 **High Fat:** Excessive strain on gallbladder and liver.",
+        "warnings_hdr": "### 🚨 Health Warnings for this Food:",
+        "warn_gluten": "🌾 **GLUTEN:** Risk of intestinal inflammation for celiacs.",
+        "warn_milk": "🥛 **Milk/Soy:** Possible goitrogen for thyroid (Hashimoto).",
+        "warn_hit": "⚠️ **High Histamine:** Watch for histamine release in HIT.",
+        "warn_gastritis": "🔥 **Stomach Irritator:** May cause reflux or ache.",
+        "warn_sugar": "🚨 **High Sugar:** Not suitable for insulin resistance.",
+        "warn_purines": "🥩 **High Purines:** Risk of gout flare-up.",
+        "warn_oxalates": "🌱 **High Oxalates:** Promotes kidney stones.",
+        "warn_high_fat": "🧈 **High Fat:** Strain on gallbladder and fatty liver.",
         
         "add_btn": "➕ Add to Daily Log",
-        "add_success": "Food added successfully.",
-        "not_found": "Food not found. Try another term.",
+        "add_success": "Food successfully added.",
+        "not_found": "Food not found in database.",
         
-        "diary_hdr": "📊 Daily Diary",
-        "status": "#### Daily Balance Summary:",
-        "feedback_hdr": "💬 Automated Clinical Feedback",
-        "save_btn": "💾 Close and Securely Save Day",
-        "save_success": "Data successfully written to cloud.",
-        "no_meals": "No logs yet. Use the 'Food Assistant' tab.",
+        "diary_hdr": "📊 Daily Overview & Bio-Feedback",
+        "status": "#### Nutrient Summary:",
+        "feedback_hdr": "💬 Smart Daily Evaluation",
+        "save_btn": "💾 Close and Save Day",
+        "save_success": "Day successfully saved to history!",
+        "no_meals": "You haven't eaten anything today.",
         
-        "symptoms_hdr": "🩺 Bio-Symptom Tracking",
-        "sym_energy": "Daily Energy (1-10):",
+        "symptoms_hdr": "🩺 How does your body feel today?",
+        "sym_energy": "Energy (1-10):",
         "sym_sleep": "Sleep Quality (1-10):",
-        "history_hdr": "📈 Trends & Root Cause Analysis",
-        "history_empty": "No historical data yet.",
-        "superfoods_hdr": "🛒 Your Therapeutic Shopping List",
-        "superfoods_desc": "These foods act as functional medicine for your current setup:",
-        "db_status_ok": "✅ Food database fully active."
+        "history_hdr": "📈 Long-term Trends & Correlations Analysis",
+        "history_empty": "History is empty. Save your first day.",
+        "superfoods_hdr": "🛒 Tailored Shopping List for Your Body",
+        "superfoods_desc": "These foods actively support healing your selected symptoms and conditions:",
+        "db_status_ok": "✅ Food database is active."
     }
 }
 
-# --- 3. NEPRIESTRELNÉ NAČÍTANIE DATABÁZY POTRAVÍN ---
+HIST_COLS = ["Dátum", "Diagnózy", "Cieľ", "Váha (kg)", "Energia", "Spánok", "Kalórie", "Sacharidy (g)", "Symptómy", "Rizikove_Dni"]
+
+# --- MOCK DATA / NAČÍTANIE ---
 @st.cache_data
-def load_food_database():
-    # Robustné mock dáta pokrývajúce slovenské aj anglické hľadanie a mikroživiny
+def load_data():
     mock_df = pd.DataFrame({
-        'ID': [1, 2, 3, 4, 5, 6, 7, 8],
-        'name_en': ['Oats', 'Spinach', 'Beef', 'Dark Chocolate', 'Beef Liver', 'Tomato', 'Greek Yogurt', 'Salmon'],
-        'name_sk': ['Ovsene vlocky', 'Spenat', 'Hovadzie maso', 'Horka cokolada', 'Hovazia pecen', 'Paradajka', 'Grecky jogurt', 'Losos'],
-        'Calories': [389, 23, 250, 546, 175, 18, 97, 208],
-        'Protein (g)': [16.9, 2.9, 26.0, 4.9, 27.0, 0.9, 10.0, 20.0],
-        'Fat (g)': [6.9, 0.4, 15.0, 31.0, 5.0, 0.2, 5.0, 13.0],
-        'Net-Carbs (g)': [66.3, 1.4, 0.0, 54.0, 4.0, 3.9, 3.6, 0.0],
-        'Sugars (g)': [0.0, 0.4, 0.0, 48.0, 0.0, 2.6, 3.6, 0.0],
-        'Fiber (g)': [10.6, 2.2, 0.0, 7.0, 0.0, 1.2, 0.0, 0.0],
-        'Iron, Fe (mg)': [4.7, 2.7, 2.6, 8.0, 18.0, 0.3, 0.1, 0.3],
-        'Zinc, Zn (mg)': [4.0, 0.5, 4.3, 2.3, 4.0, 0.2, 0.6, 0.6]
+        'ID': [1, 2, 3, 4, 5, 6, 7],
+        'name_en': ['Oats', 'Spinach', 'Beef', 'Chocolate', 'Liver', 'Tomato', 'Greek Yogurt'],
+        'name_sk': ['Ovsene vlocky', 'Spenat', 'Hovadzie maso', 'Cokolada', 'Pecen', 'Paradajka', 'Grecky jogurt'],
+        'Calories': [389, 23, 250, 546, 175, 18, 97],
+        'Protein (g)': [16.9, 2.9, 26.0, 4.9, 27.0, 0.9, 10.0],
+        'Fat (g)': [6.9, 0.4, 15.0, 31.0, 5.0, 0.2, 5.0],
+        'Net-Carbs (g)': [66.3, 1.4, 0.0, 54.0, 4.0, 3.9, 3.6],
+        'Sugars (g)': [0.0, 0.4, 0.0, 48.0, 0.0, 2.6, 3.6],
+        'Fiber (g)': [10.6, 2.2, 0.0, 7.0, 0.0, 1.2, 0.0],
+        'Iron, Fe (mg)': [4.7, 2.7, 2.6, 8.0, 18.0, 0.3, 0.1],
+        'Zinc, Zn (mg)': [4.0, 0.5, 4.3, 2.3, 4.0, 0.2, 0.6]
     })
     return mock_df
 
 def load_history():
     if os.path.exists(HISTORY_FILE):
-        try: 
-            df_h = pd.read_csv(HISTORY_FILE)
-            # Verifikácia stĺpcov, aby appka nikdy nespadla pri zmene verzie
-            if all(c in df_h.columns for c in HIST_COLS): return df_h
+        try: return pd.read_csv(HISTORY_FILE)
         except Exception: pass
     return pd.DataFrame(columns=HIST_COLS)
 
@@ -217,13 +198,14 @@ def save_history_row(row_dict):
     history_df = pd.concat([history_df, new_row], ignore_index=True)
     history_df.to_csv(HISTORY_FILE, index=False)
 
-df_food = load_food_database()
+df = load_data()
 
-# --- 4. PREHĽADNÝ SIDEBAR (KROKY POD ŠÍPKAMI) ---
-st.sidebar.markdown(f"### {TXT[lang]['profile']}")
+# --- REORGANIZOVANÝ BOČNÝ PANEL ---
+st.sidebar.write("---")
 
+# Krok 1
 with st.sidebar.expander(TXT[lang]["profile"], expanded=True):
-    st.markdown(f"<small><b>{TXT[lang]['gain_weight_tendency']}</b></small>", unsafe_allow_html=True)
+    st.markdown(f"<small>{TXT[lang]['gain_weight_tendency']}</small>", unsafe_allow_html=True)
     has_pcos = st.checkbox(TXT[lang]["pcos"])
     has_hashi = st.checkbox(TXT[lang]["hashi"])
     has_db2 = st.checkbox(TXT[lang]["db2"])
@@ -231,154 +213,134 @@ with st.sidebar.expander(TXT[lang]["profile"], expanded=True):
     has_cushing = st.checkbox(TXT[lang]["cushing"])
     has_lipedema = st.checkbox(TXT[lang]["lepid"])
 
-    st.markdown(f"<small><b>{TXT[lang]['lose_weight_tendency']}</b></small>", unsafe_allow_html=True)
+    st.markdown(f"<small>{TXT[lang]['lose_weight_tendency']}</small>", unsafe_allow_html=True)
     has_hyper = st.checkbox(TXT[lang]["hyper"])
     has_celiakia = st.checkbox(TXT[lang]["celiakia"])
     has_addison = st.checkbox(TXT[lang]["addison"])
 
-    st.markdown(f"<small><b>{TXT[lang]['digestion']}</b></small>", unsafe_allow_html=True)
+    st.markdown(f"<small>{TXT[lang]['digestion']}</small>", unsafe_allow_html=True)
     has_hit = st.checkbox(TXT[lang]["hit"])
     has_gastritis = st.checkbox(TXT[lang]["gastritis"])
     has_sibo = st.checkbox(TXT[lang]["sibo"])
     has_gallbladder = st.checkbox(TXT[lang]["gallbladder"])
 
-    st.markdown(f"<small><b>{TXT[lang]['metabolic_syndromes']}</b></small>", unsafe_allow_html=True)
+    st.markdown(f"<small>{TXT[lang]['metabolic_syndromes']}</small>", unsafe_allow_html=True)
     has_gout = st.checkbox(TXT[lang]["gout"])
     has_nafld = st.checkbox(TXT[lang]["nafld"])
     has_hypertension = st.checkbox(TXT[lang]["hypertension"])
     has_kidney_stones = st.checkbox(TXT[lang]["kidney_stones"])
 
+# Krok 2
 with st.sidebar.expander(TXT[lang]["goal_hdr"], expanded=False):
     meta_goal = st.radio(TXT[lang]["goal_q"], TXT[lang]["goals"], label_visibility="collapsed")
 
+# Krok 3
 with st.sidebar.expander(TXT[lang]["antropo"], expanded=False):
-    weight = st.number_input(TXT[lang]["weight"], min_value=10.0, max_value=250.0, value=70.0)
-    height = st.number_input(TXT[lang]["height"], min_value=100, max_value=250, value=165)
-    age = st.number_input(TXT[lang]["age"], min_value=1, max_value=120, value=30)
+    weight = st.number_input(TXT[lang]["weight"], min_value=30.0, value=70.0)
+    height = st.number_input(TXT[lang]["height"], min_value=120, value=165)
+    age = st.number_input(TXT[lang]["age"], min_value=15, value=30)
 
-# --- NEPRIESTRELNÝ CLINICAL ENGINE (VÝPOČTY) ---
-# Ochrana pred anomálnymi vstupmi (Fallback Safe Mode)
-safe_weight = max(weight, 30.0)
-safe_height = max(height, 100)
-safe_age = max(age, 15)
-
-bmr = 447.593 + (9.247 * safe_weight) + (3.098 * safe_height) - (4.330 * safe_age)
+# Výpočty cieľov (Kalórie & Makrá)
+bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age)
 base_maintenance = round(bmr * 1.2)
+if has_cushing: base_maintenance = round(base_maintenance * 0.9)
+if has_addison: base_maintenance = round(base_maintenance * 1.1)
 
-if has_cushing: base_maintenance = round(base_maintenance * 0.85)
-if has_addison: base_maintenance = round(base_maintenance * 1.15)
-
-if meta_goal in ["Zdravé chudnutie", "Healthy Weight Loss"]: target_cal = max(base_maintenance - 400, 1200)
-elif meta_goal in ["Budovanie hmoty / Pribratie", "Weight Gain / Bulking"]: target_cal = base_maintenance + 400
+if meta_goal in ["Zdravé chudnutie", "Healthy Weight Loss"]: target_cal = base_maintenance - 350
+elif meta_goal in ["Zdravé pribratie", "Healthy Weight Gain"]: target_cal = base_maintenance + 400
 else: target_cal = base_maintenance
 
-# Proteínový manažment
-if has_gout or has_kidney_stones: target_protein = round(safe_weight * 1.1)
-elif has_hyper or "Pribratie" in meta_goal or "Bulking" in meta_goal: target_protein = round(safe_weight * 1.9)
-else: target_protein = round(safe_weight * 1.5)
+# Úprava makier na základe diagnóz
+target_protein = round(weight * 1.2) if (has_gout or has_kidney_stones) else round(weight * 1.5)
+if has_hyper: target_protein = round(weight * 1.9)
 
-# Sacharidová senzitivita (Inzulínový manažment)
-carbs_percentage = 0.25 if (has_pcos or has_db2 or has_nafld) else 0.45
-if has_sibo: carbs_percentage = 0.20
+carbs_percentage = 0.25 if (has_pcos or has_db2 or has_nafld) else 0.40
+if has_sibo: carbs_percentage = 0.20 # Low FODMAP smer
 
-target_carbs = max(round((target_cal * carbs_percentage) / 4), 50)
-target_fat = max(round((target_cal * (1.0 - (carbs_percentage + 0.25))) / 9), 30)
+target_carbs = round((target_cal * carbs_percentage) / 4)
+target_fat = round((target_cal * (1.0 - (carbs_percentage + 0.25))) / 9)
 
-if has_gallbladder or has_nafld: target_fat = min(target_fat, 45)
+if has_gallbladder or has_nafld:
+    target_fat = min(target_fat, 50) # Bezpečný strop tuku pre chorý žlčník
 
-# Hydratácia upravená pre obličky
-water_intake = (safe_weight * 35) / 1000
-if has_kidney_stones: water_intake += 0.7
+# Pitný režim s ohľadom na obličkové kamene
+water_intake = (weight * 35) / 1000
+if has_kidney_stones: water_intake += 0.6
 
 st.sidebar.info(TXT[lang]["target_info"].format(cal=target_cal, prot=target_protein, carbs=target_carbs, fat=target_fat, water=water_intake))
 st.sidebar.caption(TXT[lang]["db_status_ok"])
 
-# --- 5. HLAVNÁ OBLASŤ ---
+# --- HLAVNÉ ROZHRANIE ---
 st.title(TXT[lang]["title"])
-st.markdown(f"<p style='color: gray; font-size: 1.1rem;'>{TXT[lang]['subtitle']}</p>", unsafe_allow_html=True)
-
 tab1, tab2, tab3, tab4 = st.tabs(TXT[lang]["tabs"])
 
 if 'daily_meals' not in st.session_state:
     st.session_state.daily_meals = []
 
-# --- TAB 1: POTRAVINOVÝ ASISTENT ---
 with tab1:
-    st.markdown(f"### {TXT[lang]['search_hdr']}")
-    search_query = st.text_input(TXT[lang]["search_lbl"], "", help="Môžeš písať slovensky aj anglicky.")
+    st.subheader(TXT[lang]["search_hdr"])
+    search_query = st.text_input(TXT[lang]["search_lbl"], "")
     
-    if search_query.strip():
-        # Vyhľadávanie bez ohľadu na malé/veľké písmená
-        q = search_query.strip().lower()
-        results = df_food[df_food['name_en'].str.lower().str.contains(q, na=False) | df_food['name_sk'].str.lower().str.contains(q, na=False)]
+    if search_query:
+        results = df[df['name_en'].str.contains(search_query, case=False, na=False) | df['name_sk'].str.contains(search_query, case=False, na=False)]
         
         if not results.empty:
-            food_options = results.apply(lambda row: f"{row['name_sk']} / {row['name_en']}", axis=1).tolist()
+            food_options = results.apply(lambda row: f"{row['name_en']} / {row['name_sk']}", axis=1).tolist()
             selected_option = st.selectbox(TXT[lang]["select_food"], food_options)
-            
             food_details = results.iloc[food_options.index(selected_option)]
             
-            grams = st.number_input(TXT[lang]["grams"], min_value=1, max_value=2000, value=100)
-            ratio = max(grams, 1) / 100.0
+            grams = st.number_input(TXT[lang]["grams"], min_value=1, value=100)
+            ratio = grams / 100.0
             
-            # Bezpečné vytiahnutie makier
-            cal = round(food_details.get('Calories', 0) * ratio, 1)
-            prot = round(food_details.get('Protein (g)', 0) * ratio, 1)
-            fat = round(food_details.get('Fat (g)', 0) * ratio, 1)
-            carbs = round(food_details.get('Net-Carbs (g)', 0) * ratio, 1)
-            sugar = round(food_details.get('Sugars (g)', 0) * ratio, 1)
-            fiber = round(food_details.get('Fiber (g)', 0) * ratio, 1)
-            iron = round(food_details.get('Iron, Fe (mg)', 0) * ratio, 2)
-            zinc = round(food_details.get('Zinc, Zn (mg)', 0) * ratio, 2)
+            cal = round(food_details['Calories'] * ratio, 1)
+            prot = round(food_details['Protein (g)'] * ratio, 1)
+            fat = round(food_details['Fat (g)'] * ratio, 1)
+            carbs = round(food_details['Net-Carbs (g)'] * ratio, 1)
+            sugar = round(food_details['Sugars (g)'] * ratio, 1)
+            fiber = round(food_details['Fiber (g)'] * ratio, 1)
+            iron = round(food_details['Iron, Fe (mg)'] * ratio, 2)
+            zinc = round(food_details['Zinc, Zn (mg)'] * ratio, 2)
             
-            st.markdown(TXT[lang]["analysis"].format(g=grams))
+            st.write(TXT[lang]["analysis"].format(g=grams))
             c1, c2, c3, c4 = st.columns(4)
             c1.metric(TXT[lang]["cal"], f"{cal} kcal")
             c2.metric(TXT[lang]["prot"], f"{prot} g")
             c3.metric(TXT[lang]["carbs"], f"{carbs} g")
             c4.metric(TXT[lang]["fiber"], f"{fiber} g")
             
-            # Kontrola rizík na pozadí
+            # Detekcia rizikových faktorov
             warnings = []
             f_name = f"{food_details['name_en']} {food_details['name_sk']}".lower()
-            
             if (has_celiakia or has_hashi) and any(x in f_name for x in ['wheat', 'barley', 'rye', 'muka', 'chlieb', 'lepok']): warnings.append(TXT[lang]["warn_gluten"])
             if has_hit and any(x in f_name for x in ['tomato', 'spinach', 'cheese', 'wine', 'paradaj', 'spenat', 'syr']): warnings.append(TXT[lang]["warn_hit"])
             if has_gout and any(x in f_name for x in ['beef', 'liver', 'pecen', 'hovadz']): warnings.append(TXT[lang]["warn_purines"])
             if has_kidney_stones and any(x in f_name for x in ['spinach', 'chocolate', 'spenat', 'cokolada']): warnings.append(TXT[lang]["warn_oxalates"])
-            if (has_gallbladder or has_nafld) and (fat > 12): warnings.append(TXT[lang]["warn_high_fat"])
             
             if warnings:
-                with st.expander(TXT[lang]["warnings_hdr"], expanded=True):
-                    for w in warnings: st.warning(w)
-            
-            if (has_pcos or has_db2) and sugar > 12:
-                st.error(TXT[lang]["warn_sugar"])
+                st.markdown(TXT[lang]["warnings_hdr"])
+                for w in warnings: st.warning(w)
                 
-            if st.button(TXT[lang]["add_btn"], use_container_width=True):
+            if st.button(TXT[lang]["add_btn"]):
                 st.session_state.daily_meals.append({
                     "Jedlo": selected_option, "Kalórie": cal, "Bielkoviny": prot, 
                     "Tuky": fat, "Čisté Sacharidy": carbs, "Cukor": sugar, 
-                    "Vláknina": fiber, "Železo": iron, "Zinok": zinc, "Riziko": len(warnings)
+                    "Vláknina": fiber, "Železo": iron, "Zinok": zinc, "Riziko": 1 if warnings else 0
                 })
                 st.success(TXT[lang]["add_success"])
         else:
             st.info(TXT[lang]["not_found"])
 
-# --- TAB 2: DENNÍK & BIO-FEEDBACK ---
 with tab2:
     st.header(TXT[lang]["diary_hdr"])
-    
     if st.session_state.daily_meals:
         df_today = pd.DataFrame(st.session_state.daily_meals)
-        st.dataframe(df_today[["Jedlo", "Kalórie", "Bielkoviny", "Čisté Sacharidy", "Vláknina"]], use_container_width=True)
+        st.dataframe(df_today[["Jedlo", "Kalórie", "Bielkoviny", "Čisté Sacharidy", "Vláknina"]])
         
-        t_cal = sum(df_today["Kalórie"])
-        t_carbs = sum(df_today["Čisté Sacharidy"])
-        t_prot = sum(df_today["Bielkoviny"])
-        t_fiber = sum(df_today["Vláknina"])
-        t_sugar = sum(df_today["Cukor"])
-        t_risks = sum(df_today["Riziko"])
+        t_cal = df_today["Kalórie"].sum()
+        t_carbs = df_today["Čisté Sacharidy"].sum()
+        t_prot = df_today["Bielkoviny"].sum()
+        t_fiber = df_today["Vláknina"].sum()
+        t_risks = df_today["Riziko"].sum()
         
         st.markdown(TXT[lang]["status"])
         c1, c2, c3 = st.columns(3)
@@ -386,85 +348,66 @@ with tab2:
         c2.metric(TXT[lang]["prot"], f"{round(t_prot, 1)} / {target_protein} g")
         c3.metric(TXT[lang]["carbs"], f"{round(t_carbs, 1)} / {target_carbs} g")
         
-        # Odborný metabolický feedback
+        # Automatický feedback dňa
         st.subheader(TXT[lang]["feedback_hdr"])
         if (has_pcos or has_db2) and t_fiber < 25:
-            st.error("⚠️ **Inzulínová rezistencia:** Tvoja dnešná hladina vlákniny je nízka. Pridaj do ďalšieho jedla zelenú zeleninu alebo psyllium, aby si znížil/a glykemický index.")
-        if (has_pcos or has_db2 or has_nafld) and t_sugar > 30:
-            st.error("🚨 **Sacharidové preťaženie:** Dnešný čistý cukor prekročil bezpečnú metabolickú kapacitu pečene.")
+            st.error("⚠️ **Inzulínový manažment:** Dnes máš kriticky málo vlákniny. Hrozí rýchle kolísanie cukru v krvi.")
         if has_hypertension and t_cal > base_maintenance:
-            st.warning("⚡ **Kardiovaskulárny tlak:** Zvýšený príjem kalórií nad tvoj bazálny metabolizmus dnes zbytočne namáha obehovú sústavu.")
-        if t_risks == 0 and t_cal > 0:
-            st.success("✨ **Perfektný deň:** Tvoje dnešné zloženie stravy je v úplnom súlade s tvojimi bunkovými a hormonálnymi obmedzeniami.")
+            st.warning("🚨 **Kardiovaskulárne riziko:** Kalorický nadbytok zvyšuje záťaž na krvný tlak.")
+            
     else:
         st.info(TXT[lang]["no_meals"])
-        t_cal, t_carbs, t_prot, t_fiber, t_risks = 0, 0, 0, 0, 0
         
     st.write("---")
     st.subheader(TXT[lang]["symptoms_hdr"])
     s_list = []
     col_s1, col_s2 = st.columns(2)
     with col_s1:
-        if st.checkbox("Náhly útlm energie / Vlčí hlad (Crash inzulínu)"): s_list.append("VlčiHlad")
-        if st.checkbox("Tráviaci diskomfort / Nadúvanie / Kŕče"): s_list.append("Naduvanie")
-        if st.checkbox("Bolesť kĺbov / Akútny zápal"): s_list.append("ZapalKlbov")
+        if st.checkbox("Náhly vlčí hlad (Crash inzulínu)"): s_list.append("VlčiHlad")
+        if st.checkbox("Nadúvanie a ťažoba po jedle"): s_list.append("Naduvanie")
     with col_s2:
         energy = st.slider(TXT[lang]["sym_energy"], 1, 10, 7)
         sleep = st.slider(TXT[lang]["sym_sleep"], 1, 10, 7)
         
-    if st.button(TXT[lang]["save_btn"], use_container_width=True):
+    if st.button(TXT[lang]["save_btn"]):
         row = {
-            "Dátum": str(date.today()), "Diagnózy": "Aktívny_Profil", "Cieľ": meta_goal,
+            "Dátum": str(date.today()), "Diagnózy": "Profil", "Cieľ": meta_goal,
             "Váha (kg)": weight, "Energia": energy, "Spánok": sleep,
             "Kalórie": round(t_cal, 1), "Sacharidy (g)": round(t_carbs, 1),
-            "Symptómy": ", ".join(s_list) if s_list else "Ziadne", "Rizika_Pocet": t_risks
+            "Symptómy": ", ".join(s_list) if s_list else "Ziadne", "Rizikove_Dni": t_risks
         }
         save_history_row(row)
         st.session_state.daily_meals = []
         st.success(TXT[lang]["save_success"])
         st.rerun()
 
-# --- TAB 3: KORELÁCIE & ZÁMERNÁ DIAGNOSTIKA ---
 with tab3:
     st.header(TXT[lang]["history_hdr"])
     h_df = load_history()
-    
     if not h_df.empty:
-        st.dataframe(h_df, use_container_width=True)
+        st.dataframe(h_df)
         
-        st.subheader("🔮 Pokročilá Korelačná Diagnostika (Root Cause)")
-        # Pokročilý datamining nad históriou používateľa
-        problem_days = h_df[h_df["Symptómy"].str.contains("Naduvanie|VlčiHlad|ZapalKlbov", na=False)]
-        
-        if not problem_days.empty:
-            avg_risks_on_bad_days = problem_days["Rizika_Pocet"].mean()
-            if avg_risks_on_bad_days > 0.6:
-                st.error(f"🔍 **Klinický nález:** Tvoje negatívne symptómy priamo korelujú s dňami, kedy ignoruješ varovania v Potravinovom asistentovi (Priemerne až {round(avg_risks_on_bad_days, 1)} varovných potravín v problémové dni).")
+        # PREDIKTÍVNA DIAGNOSTIKA (Hľadanie skrytých spúšťačov)
+        st.subheader("🔮 Pokročilá AI Analýza Symptómov")
+        naduvanie_dni = h_df[h_df["Symptómy"].str.contains("Naduvanie", na=False)]
+        if not naduvanie_dni.empty:
+            priemerne_riziko = naduvanie_dni["Rizikove_Dni"].mean()
+            if priemerne_riziko > 0.5:
+                st.error(f"🔍 **Objavená korelácia:** Tvoje nadúvanie sa štatisticky objavuje najmä v dni, kedy v záložke Asistent ignoruješ zdravotné varovania (priemerne {round(priemerne_riziko, 1)} varovaní na problémový deň).")
             else:
-                st.info("🔍 Tvoje symptómy pravdepodobne nespôsobujú priame potravinové alergény z databázy. Sleduj dáta ďalej.")
-        else:
-            st.success("✨ **Stabilný stav:** Podľa tvojej histórie nespôsobuje tvoj aktuálny jedálniček žiadne akútne zápaly ani metabolické crashe.")
+                st.info("🔍 Systém analyzuje dáta. Zatiaľ nie je dostatok záznamov na určenie presného spúšťača.")
     else:
         st.info(TXT[lang]["history_empty"])
 
-# --- TAB 4: NÁKUPNÝ ZOZNAM NA MIERU ---
 with tab4:
     st.header(TXT[lang]["superfoods_hdr"])
     st.write(TXT[lang]["superfoods_desc"])
     
-    active_recs = 0
     if has_anemia:
-        st.success("🩸 **Anémia / Krvotvorba:** Hovädzia pečeň, teľacie mäso, tekvicové semená (bohaté na železo). Vždy kombinuj s vitamínom C pre zvýšenie absorpcie.")
-        active_recs += 1
+        st.success("🩸 **Pre Anémiu (Železo):** Hovädzie mäso, hovädzia pečeň, tekvicové semienka, špenát + kombinovať s Vitamínom C.")
     if has_hashi:
-        st.success("🦋 **Hashimoto / Podpora štítnej žľazy:** Para orechy (zdroj selénu), divoký losos, vajcia z voľného chovu. Vyhýbaj sa surovému hlúbovému syndrómu.")
-        active_recs += 1
+        st.success("🦋 **Pre Hashimoto (Štítna žľaza):** Para orechy (selén), treska (jód), vajíčka, sinkom bohaté potraviny.")
     if has_pcos or has_db2:
-        st.success("🌾 **Inzulínová Senzitivita:** Pravé ovsené vločky, avokádo, cejlónska škorica, divoké bobuľové ovocie (čučoriedky, maliny).")
-        active_recs += 1
-    if has_gout:
-        st.success("🦴 **Eliminácia Kyseliny Močovej:** Čerešne, zelerová šťava, listová zelenina, dostatok čistej filtrovanej vody.")
-        active_recs += 1
-        
-    if active_recs == 0:
-        st.info("Navoľ si svoje špecifické zdravotné obmedzenia v ľavom paneli a tu okamžite získaš cielený zoznam terapeutických potravín.")
+        st.success("🌾 **Pre Stabilizáciu Inzulínu:** Ovsené vločky, avokádo, brokolica, škorica, strukoviny.")
+    if not (has_anemia or has_hashi or has_pcos or has_db2):
+        st.info("Zvoľ si diagnózy v bočnom paneli a tu sa ti vygeneruje nákupný lístok potravín, ktoré tvoje telo podporia.")
