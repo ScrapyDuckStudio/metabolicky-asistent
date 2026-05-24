@@ -1,39 +1,64 @@
 import streamlit as st
 import pandas as pd
 from datetime import date
-import os
 
-# Nastavenie stránky
-st.set_page_config(page_title="Metabolický Asistent & Inteligentný Kouč", layout="wide")
+# 1. NASTAVENIE STRÁNKY - Responzívne a moderné rozloženie pre PC aj mobil
+st.set_page_config(
+    page_title="Metabolický Asistent & Inteligentný Kouč", 
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-HISTORY_FILE = "zdravotna_historia_global.csv"
+# Vlastný CSS štýl pre krajší vzhľad v prehliadači a na mobile
+st.markdown("""
+<style>
+    div[data-testid="stMetricValue"] { font-size: 1.6rem !important; font-weight: 700; }
+    div[data-testid="stMetric"] {
+        background-color: #f8f9fa; padding: 12px; border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e9ecef;
+    }
+    .stExpander { border-radius: 12px !important; border: 1px solid #e9ecef !important; }
+    h1 { font-size: 2.0rem !important; font-weight: 800 !important; color: #1e293b; }
+    h2 { font-size: 1.5rem !important; color: #334155; }
+    h3 { font-size: 1.1rem !important; color: #475569; }
+</style>
+""", unsafe_allow_html=True)
 
-# Načítanie USDA dát
+# 2. BEZPEČNÉ NAČÍTANIE DÁT Z TVOJHO GITHUB REPOZITÁRA
 @st.cache_data
 def load_data():
-    df = pd.read_csv("food_data.csv", skiprows=3)
+    # Surová (Raw) linka na tvoj súbor food_data.csv na GitHube
+    url = "https://raw.githubusercontent.com/ScrapyDuckStudio/metabolicky-asistent/main/food_data.csv"
+    
+    # Načítame bez skiprows, keďže hlavička je na prvom riadku
+    df = pd.read_csv(url)
+    
+    # Vyčistíme názvy stĺpcov od prípadných medzier (napr. " name " -> "name")
     df.columns = df.columns.str.strip()
+    
+    # Pre istotu premenujeme stĺpec, ak by bol zapísaný ako Name alebo NAME
+    for col in df.columns:
+        if col.lower() == 'name':
+            df = df.rename(columns={col: 'name'})
     return df
 
 try:
     df = load_data()
-except FileNotFoundError:
-    st.error("Súbor s nutričnými dátami nebol nájdený. Uisti sa, že je v rovnakom priečinku.")
+    if 'name' not in df.columns:
+        st.error(f"🚨 V súbore chýba stĺpec 'name'. Nájdené stĺpce: {list(df.columns)}")
+        st.stop()
+except Exception as e:
+    st.error(f"Nepodarilo sa načítať súbor food_data.csv z GitHubu. Chyba: {e}")
     st.stop()
 
+# --- BEZPEČNÉ UKLADANIE PRE DEPLOYMENT (Cloudová pamäť / Session State) ---
 if 'daily_meals' not in st.session_state:
     st.session_state.daily_meals = []
 
-def load_history():
-    if os.path.exists(HISTORY_FILE):
-        return pd.read_csv(HISTORY_FILE)
-    return pd.DataFrame(columns=["Dátum", "Diagnózy", "Cieľ", "Váha (kg)", "Energia", "Spánok", "Kalórie", "Sacharidy (g)", "Symptómy"])
-
-def save_history_row(row_dict):
-    history_df = load_history()
-    new_row = pd.DataFrame([row_dict])
-    history_df = pd.concat([history_df, new_row], ignore_index=True)
-    history_df.to_csv(HISTORY_FILE, index=False)
+if 'cloud_history' not in st.session_state:
+    st.session_state.cloud_history = pd.DataFrame(
+        columns=["Dátum", "Diagnózy", "Cieľ", "Váha (kg)", "Energia", "Spánok", "Kalórie", "Sacharidy (g)", "Symptómy"]
+    )
 
 # --- BOČNÝ PANEL: DIAGNÓZY A CIELE ---
 st.sidebar.header("🧬 1. Výber zdravotného profilu")
@@ -80,14 +105,14 @@ target_fat = round((target_cal * (1.0 - (carbs_percentage + 0.25))) / 9)
 
 st.sidebar.info(f"""
 🎯 **Tvoj cieľový príjem:**
-* **Kalórie:** {target_cal} kcal
-* **Bielkoviny:** {target_protein} g
-* **Čisté sacharidy:** {target_carbs} g
-* **Tuky:** {target_fat} g
+* 💎 **Kalórie:** {target_cal} kcal
+* 🥩 **Bielkoviny:** {target_protein} g
+* 🥖 **Čisté sacharidy:** {target_carbs} g
+* 🥑 **Tuky:** {target_fat} g
 """)
 
 # --- HLAVNÁ STRÁNKA ---
-st.title("🩺 Inteligentný Metabolický & Hormonálny Tracker")
+st.title("🔬 Inteligentný Metabolický & Hormonálny Tracker")
 
 tab1, tab2, tab3 = st.tabs(["🍽️ Potravinový asistent & Diagnostika", "📊 Dnešný denník & Inteligentný feedback", "📈 Dlhodobý vývoj"])
 
@@ -148,7 +173,7 @@ with tab1:
                 if (has_pcos or has_db2) and sugar > 10:
                     st.error("🚨 **Pozor na cukor:** Vysoká inzulínová špička.")
 
-                if st.button("➕ Pridať do dňa"):
+                if st.button("➕ Pridať do dňa", use_container_width=True):
                     st.session_state.daily_meals.append({
                         "Jedlo": selected_food, "Gramy": grams, "Kalórie": cal, 
                         "Bielkoviny": prot, "Tuky": fat, "Čisté Sacharidy": carbs, 
@@ -179,7 +204,7 @@ with tab2:
     
     if st.session_state.daily_meals:
         df_today = pd.DataFrame(st.session_state.daily_meals)
-        st.dataframe(df_today[["Jedlo", "Gramy", "Kalórie", "Bielkoviny", "Čisté Sacharidy", "Cukor", "Vláknina"]])
+        st.dataframe(df_today[["Jedlo", "Gramy", "Kalórie", "Bielkoviny", "Čisté Sacharidy", "Cukor", "Vláknina"]], use_container_width=True)
         
         t_cal = df_today["Kalórie"].sum()
         t_carbs = df_today["Čisté Sacharidy"].sum()
@@ -192,18 +217,16 @@ with tab2:
         
         st.markdown(f"#### Aktuálny stav dňa:")
         c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Kalórie", f"{round(t_cal)} / {target_cal} kcal")
+        c1.metric("Kalórie celkom", f"{round(t_cal)} / {target_cal} kcal")
         c2.metric("Bielkoviny", f"{round(t_prot, 1)} / {target_protein} g")
         c3.metric("Čisté Sacharidy", f"{round(t_carbs, 1)} / {target_carbs} g")
         c4.metric("Vláknina", f"{round(t_fiber, 1)} g")
         
-        # --- NOVÁ SEKCOU: AUTOMATICKÝ KOMENTÁR / FEEDBACK ---
         st.write("---")
         st.subheader("💬 Personalizované spätné väzby a odporúčania")
         
         feedbacks = []
         
-        # 1. Spätná väzba pre PCOS / Diabetes 2. typu
         if has_pcos or has_db2:
             if t_fiber < 25:
                 feedbacks.append("🌾 **PCOS / Cukrovka:** Dnes máš **nízky príjem vlákniny** (menej ako 25g). Vláknina je kľúčová, pretože spomaľuje vstrebávanie sacharidov a bráni prudkým výkyvom inzulínu. Skús pridať chia semienka, ľanové semienka alebo brokolicu.")
@@ -213,33 +236,29 @@ with tab2:
             if t_sugar > 35:
                 feedbacks.append("🚨 **PCOS / Cukrovka:** Pozor, celkový **cukor dnes prekročil bezpečnú hranicu** (nad 35g). To môže vyvolať inzulínovú rezistenciu, zablokovať spaľovanie tukov a vyvolať vlčí hlad.")
 
-        # 2. Spätná väzba pre Anémiu
         if has_anemia:
             if t_iron < 15:
                 feedbacks.append(f"🩸 **Anémia:** Dnes si prijala len **{round(t_iron, 1)} mg železa** (odporúčaný cieľ pri anémii je aspoň 15-18mg). Bez železa bunky nemajú dostatok kyslíka na metabolické procesy. Pridaj nabudúce hovädzie mäso, tekvicové semienka alebo tmavú listovú zeleninu s kvapkou citrónu (kvôli vstrebávaniu).")
             else:
                 feedbacks.append("💪 **Anémia:** Perfektné! Máš dnes bohatý príjem železa. Tvoje bunky majú dostatok kyslíka pre energiu a metabolizmus.")
 
-        # 3. Spätná väzba pre Hashimota
         if has_hashi:
             if t_zinc < 11:
-                feedbacks.append(f"🦋 **Hashimoto:** Tvoj **zinok je dnes nízky ({round(t_zinc, 1)} mg)**. Štítna žľaza nutne potrebuje zinok na konverziu neaktívneho hormónu T4 na aktívny T3. Skús do stravy doplniť tekvicové semienka, kešu orechy, hovädzie mäso alebo morské plody.")
+                feedbacks.append(f"🦋 **Hashimoto:** Tvoj **zinok je dnes nízky ({round(t_zinc, 1)} mg)**. Štítna žľaza nutne potrebuje zinok na konverziu neaktívneho hormónu T4 na aktívny T3. Skús do stravy doplniť tekvicové semienka, kešu orechy, hovädzie mäso alebo morské polody.")
             if t_risks > 0:
                 feedbacks.append(f"⚠️ **Hashimoto:** Zjedla si dnes {t_risks} potravín s potenciálnym autoimunitným spúšťačom (lepok, sója alebo mlieko). Pozorne si večer odleduj, či sa neobjaví únava alebo mozgová hmla.")
 
-        # 4. Spätná väzba pre Celiakiu / Gastritídu / HIT
         if has_celiakia and t_risks > 0:
             feedbacks.append("🚨 **Celiakia:** V denníku máš jedlo s obsahom lepku! Pri celiakii dochádza k okamžitému poškodeniu klkov čreva, čo kompletne zastaví vstrebávanie živín a spôsobí podvýživu.")
             
         if has_gastritis and t_risks > 0:
             feedbacks.append("🔥 **Gastritída:** Zaznamenala si potravinu, ktorá dráždi sliznicu žalúdka. Ak ucítiš pálenie alebo ťažobu, vieš, ktoré jedlo to spôsobilo. Nabudúce zvoľ radšej zásaditejšie potraviny.")
 
-        # Ak nie sú žiadne negatívne komenty
         if not feedbacks:
             st.success("☀️ Tvoj dnešný jedálniček perfektne rešpektuje tvoj zdravotný stav. Žiadne riziká ani deficity neboli nájdené!")
         else:
             for f in feedbacks:
-                st.markdown(f)
+                st.info(f)
                 
     else:
         st.info("Zatiaľ si dnes nezadala žiadne potraviny. Komentár a analýza deficitov sa zobrazia hneď po pridaní prvého jedla.")
@@ -262,14 +281,14 @@ with tab2:
         energy_score = st.slider("Energia počas dňa (1-10):", 1, 10, 7)
         sleep_score = st.slider("Spánok (1-10):", 1, 10, 7)
 
-    if st.button("💾 Ukončiť a uložiť deň"):
+    if st.button("💾 Ukončiť a uložiť deň", use_container_width=True):
         diag_list = []
         if has_pcos: diag_list.append("PCOS")
         if has_hashi: diag_list.append("Hashimoto")
         if has_anemia: diag_list.append("Anemia")
         if has_celiakia: diag_list.append("Celiakia")
         
-        row_data = {
+        new_row = pd.DataFrame([{
             "Dátum": str(date.today()),
             "Diagnózy": ", ".join(diag_list) if diag_list else "Žiadne",
             "Cieľ": meta_goal,
@@ -279,18 +298,19 @@ with tab2:
             "Kalórie": round(t_cal, 1),
             "Sacharidy (g)": round(t_carbs, 1),
             "Symptómy": ", ".join(s_list) if s_list else "Žiadne"
-        }
-        save_history_row(row_data)
+        }])
+        
+        # Zápis do session_state histórie
+        st.session_state.cloud_history = pd.concat([st.session_state.cloud_history, new_row], ignore_index=True)
         st.session_state.daily_meals = []
-        st.success("Záznam uložený!")
+        st.success("Záznam úspešne uložený do cloudu!")
         st.rerun()
 
 with tab3:
     st.header("📈 Dlhodobé sledovanie vývoja tela")
-    h_df = load_history()
-    if not h_df.empty:
-        st.dataframe(h_df)
+    if not st.session_state.cloud_history.empty:
+        st.dataframe(st.session_state.cloud_history, use_container_width=True)
         st.subheader("Graf: Pohyb telesnej hmotnosti (kg)")
-        st.line_chart(h_df.set_index("Dátum")["Váha (kg)"])
+        st.line_chart(st.session_state.cloud_history.set_index("Dátum")["Váha (kg)"])
     else:
         st.info("Žiadne historické záznamy neboli zatiaľ vytvorené.")
