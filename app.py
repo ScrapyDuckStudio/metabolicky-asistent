@@ -36,7 +36,7 @@ TXT = {
         "target_info": "🎯 **Tvoj cieľový príjem:**\n* **Kalórie:** {cal} kcal\n* **Bielkoviny:** {prot} g\n* **Čisté sacharidy:** {carbs} g\n* **Tuky:** {fat} g",
         "tabs": ["🍽️ Potravinový asistent & Diagnostika", "📊 Dnešný denník & Inteligentný feedback", "📈 Dlhodobý vývoj"],
         "search_hdr": "🔍 Hľadať potravinu",
-        "search_lbl": "Zadaj názov v slovenčine alebo angličtine (napr. hovädzie, beef, špenát, oats):",
+        "search_lbl": "Zadaj názov v slovenčine alebo angličtine (napr. hovävzie, beef, špenát, oats):",
         "select_food": "Vyber potravinu:",
         "grams": "Gramáž (g):",
         "analysis": "#### 📊 Analýza pre {g}g:",
@@ -71,7 +71,7 @@ TXT = {
         "fb_anemia_iron_low": "🩸 **Anémia:** Dnes si prijala len **{iron} mg železa**.",
         "fb_anemia_iron_ok": "💪 **Anémia:** Perfektné! Máš dnes bohatý príjem železa.",
         "fb_hashi_zinc_low": "🦋 **Hashimoto:** Tvoj **zinok je dnes nízky ({zinc} mg)**.",
-        "fb_hashi_risks": "⚠️ **Hashimoto:** Zjedla si dnes {risks} potravín s potenciálním autoimunitným spúšťačom.",
+        "fb_hashi_risks": "⚠️ **Hashimoto:** Zjedla si dnes {risks} potravín s potenciálnym autoimunitným spúšťačom.",
         "fb_celiakia_risk": "🚨 **Celiakia:** V denníku máš jedlo s obsahom lepku!",
         "fb_gastritis_risk": "🔥 **Gastritída:** Zaznamenala si potravinu, ktorá dráždi sliznicu žalúdka.",
         "fb_perfect": "☀️ Tvoj dnešný jedálniček perfektne rešpektuje tvoj zdravotný stav.",
@@ -83,7 +83,7 @@ TXT = {
         "sym_lose_weight": "**Symptómy straty hmotnosti:**",
         "sym_palpitations": "Búšenie srdca / Vnútorná triaška (Hyper)",
         "sym_cramps": "Kŕče v bruchu / Hnačka (Celiakia)",
-        "sym_subjective": "**Subjektivne pocity:**",
+        "sym_subjective": "**Subjektívne pocity:**",
         "sym_energy": "Energia počas dňa (1-10):",
         "sym_sleep": "Spánok (1-10):",
         "save_btn": "💾 Ukončiť a uložiť deň",
@@ -92,7 +92,9 @@ TXT = {
         "history_empty": "Žiadne historické záznamy neboli zatiaľ vytvorené.",
         "chart_title": "Graf: Pohyb telesnej hmotnosti (kg)",
         "none": "Žiadne",
-        "err_save": "Nepodarilo sa uložiť na server"
+        "err_save": "Nepodarilo sa uložiť na server",
+        "db_status_ok": "✅ Databáza úspešne spárovaná.",
+        "db_status_upload": "📁 Databáza nenaštaná na serveri. Nahraj 'food_data_en_sk.csv' tu:"
     },
     "EN": {
         "title": "🩺 Smart Metabolic & Hormonal Tracker",
@@ -118,7 +120,7 @@ TXT = {
         "target_info": "🎯 **Your Target Intake:**\n* **Calories:** {cal} kcal\n* **Protein:** {prot} g\n* **Net Carbs:** {carbs} g\n* **Fat:** {fat} g",
         "tabs": ["🍽️ Food Assistant & Diagnostics", "📊 Daily Diary & Smart Feedback", "📈 Long-term Progress"],
         "search_hdr": "🔍 Search Food",
-        "search_lbl": "Enter name in Slovak or English (e.g. hovädzie, beef, spinach, oats):",
+        "search_lbl": "Enter name in Slovak or English (e.g. hovävzie, beef, spinach, oats):",
         "select_food": "Select food:",
         "grams": "Weight (g):",
         "analysis": "#### 📊 Analysis for {g}g:",
@@ -164,7 +166,7 @@ TXT = {
         "sym_weakness": "Extreme muscle weakness (Anemia)",
         "sym_lose_weight": "**Weight Loss Symptoms:**",
         "sym_palpitations": "Heart palpitations / Internal tremors (Hyper)",
-        "sym_cramps": "Autominal cramps / Diarrhea (Celiac)",
+        "sym_cramps": "Abdominal cramps / Diarrhea (Celiac)",
         "sym_subjective": "**Subjective Feelings:**",
         "sym_energy": "Energy during the day (1-10):",
         "sym_sleep": "Sleep quality (1-10):",
@@ -174,41 +176,41 @@ TXT = {
         "history_empty": "No history logs created yet.",
         "chart_title": "Chart: Body Weight Progress (kg)",
         "none": "None",
-        "err_save": "Failed to save to server"
+        "err_save": "Failed to save to server",
+        "db_status_ok": "✅ Food database linked successfully.",
+        "db_status_upload": "📁 Database file not found on repository. Upload 'food_data_en_sk.csv' here:"
     }
 }
 
-# Historické stĺpce (na ukladanie fixnej štruktúry do CSV)
 HIST_COLS = ["Dátum", "Diagnózy", "Cieľ", "Váha (kg)", "Energia", "Spánok", "Kalórie", "Sacharidy (g)", "Symptómy"]
 
-# --- NAČÍTANIE DATABÁZY POTRAVÍN ---
-# --- NAČÍTANIE DATABÁZY POTRAVÍN ---
+# --- INTELIGENTNÉ NAČÍTANIE DATABÁZY POTRAVÍN ---
 @st.cache_data
-def load_data(uploaded_file):
-    # Ak používateľ nahral súbor cez webové rozhranie
+def load_data(uploaded_file=None):
+    # Krok 1: Pokus o načítanie z webového uploaderu
     if uploaded_file is not None:
         try:
             df = pd.read_csv(uploaded_file, skiprows=3)
             df.columns = df.columns.str.strip()
-            return df
-        except Exception as e:
-            st.error(f"Chyba pri spracovaní nahraného súboru: {e}")
-    
-    # Skúška, či súbor neexistuje lokálne na serveri/disku
+            return df, True
+        except Exception:
+            pass
+
+    # Krok 2: Pokus o načítanie z lokálneho disku
     file_name = "food_data_en_sk.csv"
     if os.path.exists(file_name):
         try:
             df = pd.read_csv(file_name, skiprows=3)
             df.columns = df.columns.str.strip()
-            return df
+            return df, True
         except Exception:
             pass
             
-    # Záložné mock dáta, ak súbor úplne chýba
-    return pd.DataFrame({
+    # Krok 3: Bezpečný Fallback na Mock dáta (aby appka nezamrzla)
+    mock_df = pd.DataFrame({
         'ID': [1, 2, 3],
         'name_en': ['Oats', 'Spinach', 'Beef'],
-        'name_sk': ['Ovsené vločky', 'Špenát', 'Hovädzie mäso'],
+        'name_sk': ['Ovsene vlocky', 'Spenat', 'Hovadzie maso'],
         'Calories': [389, 23, 250],
         'Protein (g)': [16.9, 2.9, 26.0],
         'Fat (g)': [6.9, 0.4, 15.0],
@@ -218,17 +220,9 @@ def load_data(uploaded_file):
         'Iron, Fe (mg)': [4.7, 2.7, 2.6],
         'Zinc, Zn (mg)': [4.0, 0.5, 4.3]
     })
+    return mock_df, False
 
-# Pridanie widgetu na nahranie súboru na začiatok hlavnej stránky
-st.subheader("📁 Nahrávenie databázy potravín")
-uploaded_file = st.file_uploader("Nahraj súbor food_data_en_sk.csv", type=["csv"])
-
-# Načítanie dát s odovzdaním nahraného súboru
-df = load_data(uploaded_file)
-
-if 'daily_meals' not in st.session_state:
-    st.session_state.daily_meals = []
-
+# --- KONTROLA HISTÓRIE ---
 def load_history():
     if os.path.exists(HISTORY_FILE):
         try:
@@ -246,7 +240,8 @@ def save_history_row(row_dict):
     except Exception as e:
         st.error(f"{TXT[lang]['err_save']}: {e}")
 
-# --- BOČNÝ PANEL: DIAGNÓZY A CIELE ---
+
+# --- PRÍPRAVA BOČNÉHO PANELU ---
 st.sidebar.header(TXT[lang]["profile"])
 
 st.sidebar.markdown(TXT[lang]["gain_weight_tendency"])
@@ -264,6 +259,19 @@ has_hit = st.sidebar.checkbox(TXT[lang]["hit"], value=False)
 has_gastritis = st.sidebar.checkbox(TXT[lang]["gastritis"], value=False)
 
 st.sidebar.write("---")
+
+# Uploader umiestnený do bočného panelu pre čistý dizajn
+uploaded_file = None
+if not os.path.exists("food_data_en_sk.csv"):
+    st.sidebar.warning(TXT[lang]["db_status_upload"])
+    uploaded_file = st.sidebar.file_uploader("", type=["csv"])
+else:
+    st.sidebar.success(TXT[lang]["db_status_ok"])
+
+# Načítanie dát
+df, is_real_db = load_data(uploaded_file)
+
+st.sidebar.write("---")
 st.sidebar.header(TXT[lang]["goal_hdr"])
 meta_goal = st.sidebar.radio(TXT[lang]["goal_q"], TXT[lang]["goals"])
 
@@ -273,7 +281,7 @@ weight = st.sidebar.number_input(TXT[lang]["weight"], min_value=30.0, value=70.0
 height = st.sidebar.number_input(TXT[lang]["height"], min_value=120, value=165)
 age = st.sidebar.number_input(TXT[lang]["age"], min_value=15, value=30)
 
-# Výpočet kalórií (BMR)
+# Výpočet metabolických cieľov
 bmr = round(447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age))
 base_maintenance = round(bmr * 1.2)
 
@@ -291,7 +299,10 @@ target_fat = round((target_cal * (1.0 - (carbs_percentage + 0.25))) / 9)
 
 st.sidebar.info(TXT[lang]["target_info"].format(cal=target_cal, prot=target_protein, carbs=target_carbs, fat=target_fat))
 
-# --- HLAVNÁ STRÁNKA ---
+if 'daily_meals' not in st.session_state:
+    st.session_state.daily_meals = []
+
+# --- HLAVNÉ ROZHRANIE APPky ---
 st.title(TXT[lang]["title"])
 
 tab1, tab2, tab3 = st.tabs(TXT[lang]["tabs"])
@@ -306,18 +317,16 @@ with tab1:
         search_query = st.text_input(TXT[lang]["search_lbl"], "")
         
         if search_query:
-            # INTELIGENTNÉ BILINGVÁLNE VYHĽADÁVANIE: hľadá sa v SK aj EN stĺpci naraz
+            # Vyhľadávanie naprieč oboma stĺpcami (anglický aj slovenský)
             results = df[
                 df['name_en'].str.contains(search_query, case=False, na=False) | 
                 df['name_sk'].str.contains(search_query, case=False, na=False)
             ]
             
             if not results.empty:
-                # Vytvorenie pekného popisu spojením oboch jazykov pre výberové menu
                 food_options = results.apply(lambda row: f"{row['name_en']} / {row['name_sk']}", axis=1).tolist()
                 selected_option = st.selectbox(TXT[lang]["select_food"], food_options)
                 
-                # Spätné vyhľadanie riadku na základe vybranej kombinácie textu
                 selected_idx = food_options.index(selected_option)
                 food_details = results.iloc[selected_idx]
                 
@@ -333,10 +342,10 @@ with tab1:
                 iron = round(food_details.get('Iron, Fe (mg)', 0) * ratio, 2)
                 zinc = round(food_details.get('Zinc, Zn (mg)', 0) * ratio, 2)
                 
-                # Zlučujeme anglický aj slovenský názov pre kontrolu alergénov
                 full_name_lower = f"{food_details['name_en']} {food_details['name_sk']}".lower()
                 warnings = []
                 
+                # Výpočet alergénov a zdravotných rizík
                 if has_celiakia or has_hashi:
                     if any(x in full_name_lower for x in ['wheat', 'barley', 'rye', 'flour', 'bread', 'gluten', 'psenica', 'jacmen', 'raz', 'muka', 'chlieb', 'lepok']):
                         warnings.append(TXT[lang]["warn_gluten"])
@@ -396,9 +405,8 @@ with tab2:
     
     if st.session_state.daily_meals:
         df_today = pd.DataFrame(st.session_state.daily_meals)
-        
         df_display = df_today.copy()
-        # Prispôsobenie záhlavia tabuľky podľa jazyka rozhrania
+        
         if lang == "SK":
             df_display.columns = ["Jedlo", "Gramy", "Kalórie", "Bielkoviny", "Tuky", "Čisté Sacharidy", "Cukor", "Vláknina", "Železo", "Zinok", "Riziko"]
         else:
@@ -432,7 +440,6 @@ with tab2:
                 feedbacks.append(TXT[lang]["fb_pcos_fiber_low"])
             else:
                 feedbacks.append(TXT[lang]["fb_pcos_fiber_ok"])
-                
             if t_sugar > 35:
                 feedbacks.append(TXT[lang]["fb_pcos_sugar_high"])
 
@@ -450,7 +457,6 @@ with tab2:
 
         if has_celiakia and t_risks > 0:
             feedbacks.append(TXT[lang]["fb_celiakia_risk"])
-            
         if has_gastritis and t_risks > 0:
             feedbacks.append(TXT[lang]["fb_gastritis_risk"])
 
@@ -459,7 +465,6 @@ with tab2:
         else:
             for f in feedbacks:
                 st.markdown(f)
-                
     else:
         st.info(TXT[lang]["no_meals"])
 
