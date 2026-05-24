@@ -867,7 +867,7 @@ with tab2:
         # ---------------------------
         # FEEDBACK (SINGLE SOURCE OF TRUTH)
         # ---------------------------
-        feedbacks = []
+    feedbacks = []
 
         if has_pcos or has_db2:
             feedbacks.append(
