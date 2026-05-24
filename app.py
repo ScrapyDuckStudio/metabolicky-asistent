@@ -6,7 +6,7 @@ from functools import lru_cache
 import google.generativeai as genai
 
 # Configure API - Ideally use st.secrets for production
-genai.configure(api_key="YOUR_GEMINI_API_KEY")
+genai.configure(api_key="AIzaSyBhT_QNl2gIq97um3nePx58TtA1oOUk_T0")
 
 def get_smart_coach_feedback(daily_meals, health_conditions, water_intake, symptoms):
     model = genai.GenerativeModel('gemini-1.5-flash')
@@ -805,6 +805,8 @@ with tab1:
 # --- TAB 2: DAILY DIARY ---
 # --- TAB 2: DAILY DIARY ---
 with tab2:
+   # --- TAB 2: DAILY DIARY ---
+with tab2:
     st.header(txt("diary_hdr"))
     
     if st.session_state.daily_meals:
@@ -838,7 +840,53 @@ with tab2:
         c4.metric(txt("fiber"), f"{round(t_fiber, 1)} g")
         
         st.divider()
+
+        # --- AI INTEGRÁCIA ---
+        st.subheader("🤖 AI Coaching Advice")
+        if st.button("Get AI Coaching Advice"):
+            with st.spinner("AI asistent analyzuje tvoj metabolický profil..."):
+                # Príprava kontextu pre AI
+                meals_summary = [f"{m['Jedlo']} ({m['Gramy']}g)" for m in st.session_state.daily_meals]
+                conditions = [k for k, v in health_conditions.items() if v]
+                
+                # Volanie funkcie (uistite sa, že funkcia je definovaná v hornej časti súboru)
+                advice = get_smart_coach_feedback(
+                    daily_meals=meals_summary, 
+                    health_conditions=conditions, 
+                    water_intake=st.session_state.water_glasses * 0.25, 
+                    symptoms=",".join(s_list) if 's_list' in locals() else "None"
+                )
+                st.info(advice)
+        
+        st.divider()
         st.subheader(txt("feedback_hdr"))
+        
+        # Logika pre existujúce spätné väzby
+        feedbacks = []
+        if has_pcos or has_db2:
+            feedbacks.append(txt("fb_pcos_fiber_low") if t_fiber < 25 else txt("fb_pcos_fiber_ok"))
+        if (has_pcos or has_db2 or has_nafld) and t_sugar > 35:
+            feedbacks.append(txt("fb_pcos_sugar_high"))
+        if has_anemia:
+            feedbacks.append(txt("fb_anemia_iron_low").format(iron=round(t_iron, 1)) if t_iron < 15 else txt("fb_anemia_iron_ok"))
+        if has_hashi:
+            if t_zinc < 11: feedbacks.append(txt("fb_hashi_zinc_low").format(zinc=round(t_zinc, 1)))
+            if t_risks > 0: feedbacks.append(txt("fb_hashi_risks").format(risks=int(t_risks)))
+        if has_celiakia and t_risks > 0: feedbacks.append(txt("fb_celiakia_risk"))
+        if has_gastritis and t_risks > 0: feedbacks.append(txt("fb_gastritis_risk"))
+        if has_gout and t_risks > 0: feedbacks.append(txt("fb_gout_risk"))
+        
+        # Hydratácia
+        t_water = st.session_state.water_glasses * 0.25
+        feedbacks.append(txt("fb_water_low").format(target=target_water) if t_water < target_water * 0.8 else txt("fb_water_ok"))
+        
+        for feedback in feedbacks:
+            st.info(feedback)
+    else:
+        st.info(txt("no_meals"))
+    
+    st.divider()
+    # ... (ostatné časti kódu pre vodu a symptómy zostávajú nezmenené)
         
         # Generate feedback
         feedbacks = []
