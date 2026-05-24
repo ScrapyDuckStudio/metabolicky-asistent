@@ -3,30 +3,7 @@ import pandas as pd
 from datetime import date
 import os
 from functools import lru_cache
-import google.generativeai as genai
 
-# Configure API - Ideally use st.secrets for production
-genai.configure(api_key="AIzaSyBhT_QNl2gIq97um3nePx58TtA1oOUk_T0")
-
-def get_smart_coach_feedback(daily_meals, health_conditions, water_intake, symptoms):
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    
-    # Construct a rich context for the AI
-    prompt = f"""
-    Act as a supportive, expert metabolic nutritionist. 
-    Analyze this daily log for a user with these conditions: {health_conditions}.
-    Daily meals: {daily_meals}.
-    Water intake: {water_intake}L.
-    Reported symptoms: {symptoms}.
-    
-    Provide 3 brief, encouraging, and evidence-based tips to improve their metabolic health 
-    for tomorrow, keeping their specific conditions in mind. Use a warm, professional tone.
-    """
-    try:
-        response = model.generate_content(prompt)
-        return response.text
-    except Exception as e:
-        return "Coach is currently resting. Keep up the good work!"
 # ==================== PAGE CONFIGURATION ====================
 st.set_page_config(
     page_title="Metabolický Asistent & Inteligentný Kouč",
@@ -855,32 +832,6 @@ with tab2:
         c2.metric(txt("prot"), f"{round(t_prot, 1)} / {target_protein} g")
         c3.metric(txt("carbs"), f"{round(t_carbs, 1)} / {target_carbs} g")
         c4.metric(txt("fiber"), f"{round(t_fiber, 1)} g")
-
-        st.divider()
-
-        # ---------------------------
-        # AI COACHING
-        # ---------------------------
-        st.subheader("🤖 AI Coaching Advice")
-
-        if st.button("Get AI Coaching Advice"):
-            with st.spinner("AI asistent analyzuje tvoj metabolický profil..."):
-
-                meals_summary = [
-                    f"{m.get('Jedlo','?')} ({m.get('Gramy',0)}g)"
-                    for m in st.session_state.daily_meals
-                ]
-
-                conditions = [k for k, v in health_conditions.items() if v]
-
-                advice = get_smart_coach_feedback(
-                    daily_meals=meals_summary,
-                    health_conditions=conditions,
-                    water_intake=st.session_state.water_glasses * 0.25,
-                    symptoms=",".join(s_list) if "s_list" in locals() else "None"
-                )
-
-                st.info(advice)
 
         st.divider()
 
