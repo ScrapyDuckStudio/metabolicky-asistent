@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import date
 import os
 
-# --- NASTAVENIE STRÁNKY ---
+# --- NASTAVENIE STRÁNKY, ---
 st.set_page_config(page_title="Metabolický Asistent & Inteligentný Kouč", layout="wide")
 
 HISTORY_FILE = "zdravotna_historia_global.csv"
