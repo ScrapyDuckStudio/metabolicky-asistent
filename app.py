@@ -169,7 +169,7 @@ TRANSLATIONS = {
         "target_info": "🎯 **Tvoj cieľový príjem:**\n* **Kalórie:** {cal} kcal\n* **Bielkoviny:** {prot} g\n* **Čisté sacharidy:** {carbs} g\n* **Tuky:** {fat} g\n* **Voda:** {water} L",
         
         # Tabs
-        "tabs": ["🍽️ Potravinový asistent", "📊 Dnešný denník", "📈 Dlhodobý vývoj"],
+        "tabs": ["🍽️ Potravinový asistent", "📊 Dnešný denník", "📈 Dlhodobý vývoj", "Nakupny kosik"],
         
         # Food search
         "search_hdr": "🔍 Hľadať potravinu",
@@ -313,7 +313,7 @@ TRANSLATIONS = {
         "target_info": "🎯 **Your Target Intake:**\n* **Calories:** {cal} kcal\n* **Protein:** {prot} g\n* **Net Carbs:** {carbs} g\n* **Fat:** {fat} g\n* **Water:** {water} L",
         
         # Tabs
-        "tabs": ["🍽️ Food Assistant", "📊 Daily Diary", "📈 Long-term Progress"],
+        "tabs": ["🍽️ Food Assistant", "📊 Daily Diary", "📈 Long-term Progress", "Shopping cart"],
         
         # Food search
         "search_hdr": "🔍 Search Food",
@@ -690,7 +690,7 @@ health_conditions = {
 }
 
 # ==================== MAIN TABS ====================
-tab1, tab2, tab3 = st.tabs(TRANSLATIONS[get_lang()]["tabs"])
+tab1, tab2, tab3, tab4 = st.tabs(TRANSLATIONS[get_lang()]["tabs"])
 
 # --- TAB 1: FOOD ASSISTANT ---
 with tab1:
