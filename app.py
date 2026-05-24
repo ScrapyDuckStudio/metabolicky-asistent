@@ -780,30 +780,228 @@ with tab1:
                 st.write(txt("enc_nafld_b"))
 
 # --- TAB 2: DAILY DIARY ---
-# --- TAB 2: DAILY DIARY ---
-   # --- TAB 2: DAILY DIARY ---
 with tab2:
 
-        for label_key, value, key in symptom_groups[1]:
-            if st.checkbox(txt(label_key), key=key):
-                selected_symptoms.append(value)
+    st.header(txt("diary_hdr"))
+
+    # =====================================================
+    # DAILY MEALS
+    # =====================================================
+    has_meals = bool(st.session_state.daily_meals)
+
+    if has_meals:
+
+        df_today = pd.DataFrame(st.session_state.daily_meals)
+
+        st.dataframe(
+            df_today,
+            use_container_width=True,
+            hide_index=True
+        )
+
+        totals = {
+            "calories": round(df_today["Kalórie"].sum(), 1),
+            "carbs": round(df_today["Čisté Sacharidy"].sum(), 1),
+            "protein": round(df_today["Bielkoviny"].sum(), 1),
+            "fiber": round(df_today["Vláknina"].sum(), 1),
+            "sugar": round(df_today["Cukor"].sum(), 1),
+            "iron": round(df_today["Železo"].sum(), 1),
+            "zinc": round(df_today["Zinok"].sum(), 1),
+            "risks": round(df_today["Rizikové"].sum(), 1)
+        }
+
+    else:
+
+        st.info(txt("no_meals"))
+
+        totals = {
+            "calories": 0,
+            "carbs": 0,
+            "protein": 0,
+            "fiber": 0,
+            "sugar": 0,
+            "iron": 0,
+            "zinc": 0,
+            "risks": 0
+        }
+
+    # =====================================================
+    # METRICS
+    # =====================================================
+    st.markdown(txt("status"))
+
+    m1, m2, m3, m4 = st.columns(4)
+
+    m1.metric(
+        txt("cal"),
+        f"{totals['calories']} / {target_cal} kcal"
+    )
+
+    m2.metric(
+        txt("prot"),
+        f"{totals['protein']} / {target_protein} g"
+    )
+
+    m3.metric(
+        txt("carbs"),
+        f"{totals['carbs']} / {target_carbs} g"
+    )
+
+    m4.metric(
+        txt("fiber"),
+        f"{totals['fiber']} g"
+    )
+
+    st.divider()
+
+    # =====================================================
+    # WATER TRACKER
+    # =====================================================
+    st.subheader(txt("water_hdr"))
+
+    c1, c2, c3 = st.columns(3)
+
+    with c1:
+        if st.button(
+            f"{txt('water_intake')} 💧",
+            use_container_width=True
+        ):
+            st.session_state.water_glasses += 1
+
+    with c2:
+        if st.button(
+            "➖",
+            use_container_width=True
+        ):
+            st.session_state.water_glasses = max(
+                0,
+                st.session_state.water_glasses - 1
+            )
+
+    with c3:
+        if st.button(
+            "🔄",
+            use_container_width=True
+        ):
+            st.session_state.water_glasses = 0
+
+    water_total = round(
+        st.session_state.water_glasses * 0.25,
+        2
+    )
+
+    st.metric(
+        txt("water_total"),
+        f"{water_total} / {target_water} L"
+    )
+
+    st.divider()
+
+    # =====================================================
+    # FEEDBACK
+    # =====================================================
+    st.subheader(txt("feedback_hdr"))
+
+    feedbacks = []
+
+    if has_pcos or has_db2:
+        if totals["fiber"] < 25:
+            feedbacks.append(txt("fb_pcos_fiber_low"))
+        else:
+            feedbacks.append(txt("fb_pcos_fiber_ok"))
+
+    if (has_pcos or has_db2 or has_nafld) and totals["sugar"] > 35:
+        feedbacks.append(txt("fb_pcos_sugar_high"))
+
+    if has_anemia:
+        if totals["iron"] < 15:
+            feedbacks.append(
+                txt("fb_anemia_iron_low").format(
+                    iron=totals["iron"]
+                )
+            )
+        else:
+            feedbacks.append(txt("fb_anemia_iron_ok"))
+
+    if has_hashi and totals["zinc"] < 11:
+        feedbacks.append(
+            txt("fb_hashi_zinc_low").format(
+                zinc=totals["zinc"]
+            )
+        )
+
+    if has_gout and totals["risks"] > 0:
+        feedbacks.append(txt("fb_gout_risk"))
+
+    if water_total < target_water * 0.8:
+        feedbacks.append(
+            txt("fb_water_low").format(
+                target=target_water
+            )
+        )
+    else:
+        feedbacks.append(txt("fb_water_ok"))
+
+    if not feedbacks:
+        feedbacks.append(txt("fb_perfect"))
+
+    for feedback in feedbacks:
+        st.info(feedback)
+
+    st.divider()
+
+    # =====================================================
+    # SYMPTOMS
+    # =====================================================
+    st.subheader(txt("symptoms_hdr"))
+
+    symptom_columns = st.columns(3)
+
+    selected_symptoms = []
+
+    with symptom_columns[0]:
+
+        st.markdown(txt("sym_gain_fatigue"))
+
+        if st.checkbox(txt("sym_hunger"), key="hunger"):
+            selected_symptoms.append("Hunger")
+
+        if st.checkbox(txt("sym_weakness"), key="weakness"):
+            selected_symptoms.append("Weakness")
+
+        if st.checkbox(txt("sym_bloating"), key="bloating"):
+            selected_symptoms.append("Bloating")
+
+    with symptom_columns[1]:
+
+        st.markdown(txt("sym_lose_weight"))
+
+        if st.checkbox(txt("sym_palpitations"), key="palpitations"):
+            selected_symptoms.append("Palpitations")
+
+        if st.checkbox(txt("sym_cramps"), key="cramps"):
+            selected_symptoms.append("Cramps")
+
+        if st.checkbox(txt("sym_gout_pain"), key="gout_pain"):
+            selected_symptoms.append("Gout Pain")
 
     with symptom_columns[2]:
+
         st.markdown(txt("sym_subjective"))
 
         energy_score = st.slider(
             txt("sym_energy"),
-            min_value=1,
-            max_value=10,
-            value=7,
+            1,
+            10,
+            7,
             key="energy"
         )
 
         sleep_score = st.slider(
             txt("sym_sleep"),
-            min_value=1,
-            max_value=10,
-            value=7,
+            1,
+            10,
+            7,
             key="sleep"
         )
 
@@ -847,7 +1045,6 @@ with tab2:
 
         save_history_row(row_data)
 
-        # Reset state
         st.session_state.daily_meals = []
         st.session_state.water_glasses = 0
 
