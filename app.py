@@ -36,7 +36,7 @@ st.markdown("""
 # Načítanie USDA dát priamo z cloudu (používateľ nemusí nahrávať obrovský súbor na GitHub)
 @st.cache_data
 def load_data():
-    url = "https://raw.githubusercontent.com/tomas-b/public-data/main/MyFoodData-Nutrition-Facts-SpreadSheet-Release-1-4.xlsx%20-%20SR%20Legacy%20and%20FNDDS.csv"
+    url = "https://raw.githubusercontent.com/tomas-b/public-data/main/food_data.csv"
     df = pd.read_csv(url, skiprows=3)
     df.columns = df.columns.str.strip()
     return df
