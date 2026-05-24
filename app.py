@@ -134,7 +134,6 @@ TXT = {
         "chart_title": "Graf: Pohyb telesnej hmotnosti (kg)",
         "none": "Žiadne",
         "err_save": "Nepodarilo sa uložiť na server",
-        "db_status_ok": "✅ Databáza úspešne spárovaná.",
         "db_status_upload": "📁 Databáza nenájdená na serveri. Nahraj 'food_data_en_sk.csv' tu:"
     },
     "EN": {
@@ -259,7 +258,6 @@ TXT = {
         "chart_title": "Chart: Body Weight Progress (kg)",
         "none": "None",
         "err_save": "Failed to save to server",
-        "db_status_ok": "✅ Food database linked successfully.",
         "db_status_upload": "📁 Database file not found on repository. Upload 'food_data_en_sk.csv' here:"
     }
 }
