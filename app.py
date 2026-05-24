@@ -34,18 +34,37 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 2. NAČÍTANIE DÁT PRIAMO Z TVOJHO GITHUB-U
+# 2. NAČÍTANIE DÁT PRIAMO Z TVOJHO GITHUB-U
 @st.cache_data
 def load_data():
     # Surová (Raw) linka na tvoj súbor food_data.csv
     url = "https://raw.githubusercontent.com/ScrapyDuckStudio/metabolicky-asistent/main/food_data.csv"
     
-    # Načítanie dát (bez vynechávania riadkov, keďže hlavička je na začiatku)
+    # Načítanie dát
     df = pd.read_csv(url)
+    
+    # ODSTRÁNENIE CHÝB S NÁZVAMI STĹPCOV:
+    # 1. Odstráni prázdne medzery okolo názvov stĺpcov (napr. " name " -> "name")
     df.columns = df.columns.str.strip()
+    
+    # 2. Ak v súbore nie je presne 'name', ale napríklad 'Name' alebo 'NAME', 
+    # premenujeme ho na malé 'name', aby kód nespadol
+    for col in df.columns:
+        if col.lower() == 'name':
+            df = df.rename(columns={col: 'name'})
+            
     return df
 
 try:
     df = load_data()
+    
+    # POISTKA: Ak stĺpec 'name' stále chýba, aplikácia nepadne s červenou chybou,
+    # ale vypíše ti zoznam stĺpcov, ktoré reálne v súbore máš.
+    if 'name' not in df.columns:
+        st.error(f"🚨 Chyba: V tvojom súbore food_data.csv chýba stĺpec 'name'. "
+                 f"Tvoj súbor obsahuje iba tieto stĺpce: {list(df.columns)}")
+        st.stop()
+
 except Exception as e:
     st.error(f"Nepodarilo sa načítať súbor food_data.csv z tvojho GitHubu. Chyba: {e}")
     st.stop()
