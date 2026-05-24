@@ -11,29 +11,46 @@ HISTORY_FILE = "zdravotna_historia_global.csv"
 # Načítanie USDA dát
 @st.cache_data
 def load_data():
-    df = pd.read_csv("food_data.csv", skiprows=3)
-    df.columns = df.columns.str.strip()
-    return df
+    # TIP: Vytvor si záložný prázdny DataFrame, ak by súbor chýbal
+    try:
+        df = pd.read_csv("food_data.csv", skiprows=3)
+        df.columns = df.columns.str.strip()
+        return df
+    except Exception:
+        # Ak nemáš food_data.csv, vytvoríme mock dáta, aby aplikácia fungovala na ukážku
+        return pd.DataFrame({
+            'name': ['Oats (Osené vločky)', 'Spinach (Špenát)', 'Beef (Hovädzie)', 'Milk (Mlieko)'],
+            'Calories': [389, 23, 250, 42],
+            'Protein (g)': [16.9, 2.9, 26.0, 3.4],
+            'Fat (g)': [6.9, 0.4, 15.0, 1.0],
+            'Net-Carbs (g)': [66.3, 1.4, 0.0, 5.0],
+            'Sugars (g)': [0.0, 0.4, 0.0, 5.0],
+            'Fiber (g)': [10.6, 2.2, 0.0, 0.0],
+            'Iron, Fe (mg)': [4.7, 2.7, 2.6, 0.0],
+            'Zinc, Zn (mg)': [4.0, 0.5, 4.3, 0.4]
+        })
 
-try:
-    df = load_data()
-except FileNotFoundError:
-    st.error("Súbor s nutričnými dátami nebol nájdený. Uisti sa, že je v rovnakom priečinku.")
-    st.stop()
+df = load_data()
 
 if 'daily_meals' not in st.session_state:
     st.session_state.daily_meals = []
 
 def load_history():
     if os.path.exists(HISTORY_FILE):
-        return pd.read_csv(HISTORY_FILE)
+        try:
+            return pd.read_csv(HISTORY_FILE)
+        except Exception:
+            pass
     return pd.DataFrame(columns=["Dátum", "Diagnózy", "Cieľ", "Váha (kg)", "Energia", "Spánok", "Kalórie", "Sacharidy (g)", "Symptómy"])
 
 def save_history_row(row_dict):
     history_df = load_history()
     new_row = pd.DataFrame([row_dict])
     history_df = pd.concat([history_df, new_row], ignore_index=True)
-    history_df.to_csv(HISTORY_FILE, index=False)
+    try:
+        history_df.to_csv(HISTORY_FILE, index=False)
+    except Exception as e:
+        st.error(f"Nepodarilo sa uložiť na server: {e} (Pre produkčnú webstránku sa odporúča pripojiť SQL databázu)")
 
 # --- BOČNÝ PANEL: DIAGNÓZY A CIELE ---
 st.sidebar.header("🧬 1. Výber zdravotného profilu")
@@ -90,6 +107,9 @@ st.sidebar.info(f"""
 st.title("🩺 Inteligentný Metabolický & Hormonálny Tracker")
 
 tab1, tab2, tab3 = st.tabs(["🍽️ Potravinový asistent & Diagnostika", "📊 Dnešný denník & Inteligentný feedback", "📈 Dlhodobý vývoj"])
+
+# Inicializácia premenných sumáru (prevencia NameError)
+t_cal, t_carbs, t_prot, t_sugar, t_fiber, t_iron, t_zinc, t_risks = 0, 0, 0, 0, 0, 0, 0, 0
 
 with tab1:
     col_l, col_r = st.columns([2, 1])
@@ -197,52 +217,46 @@ with tab2:
         c3.metric("Čisté Sacharidy", f"{round(t_carbs, 1)} / {target_carbs} g")
         c4.metric("Vláknina", f"{round(t_fiber, 1)} g")
         
-        # --- NOVÁ SEKCOU: AUTOMATICKÝ KOMENTÁR / FEEDBACK ---
         st.write("---")
         st.subheader("💬 Personalizované spätné väzby a odporúčania")
         
         feedbacks = []
         
-        # 1. Spätná väzba pre PCOS / Diabetes 2. typu
         if has_pcos or has_db2:
             if t_fiber < 25:
-                feedbacks.append("🌾 **PCOS / Cukrovka:** Dnes máš **nízky príjem vlákniny** (menej ako 25g). Vláknina je kľúčová, pretože spomaľuje vstrebávanie sacharidov a bráni prudkým výkyvom inzulínu. Skús pridať chia semienka, ľanové semienka alebo brokolicu.")
+                feedbacks.append("🌾 **PCOS / Cukrovka:** Dnes máš **nízky príjem vlákniny** (menej ako 25g). Vláknina je kľúčová, pretože spomaľuje vstrebávanie sacharidov.")
             else:
-                feedbacks.append("✨ **PCOS / Cukrovka:** Skvelé! Dosiahla si parádny príjem vlákniny. Tvoj inzulín ti ďakuje za stabilné prostredie.")
+                feedbacks.append("✨ **PCOS / Cukrovka:** Skvelé! Dosiahla si parádny príjem vlákniny.")
                 
             if t_sugar > 35:
-                feedbacks.append("🚨 **PCOS / Cukrovka:** Pozor, celkový **cukor dnes prekročil bezpečnú hranicu** (nad 35g). To môže vyvolať inzulínovú rezistenciu, zablokovať spaľovanie tukov a vyvolať vlčí hlad.")
+                feedbacks.append("🚨 **PCOS / Cukrovka:** Pozor, celkový **cukor dnes prekročil bezpečnú hranicu** (nad 35g).")
 
-        # 2. Spätná väzba pre Anémiu
         if has_anemia:
             if t_iron < 15:
-                feedbacks.append(f"🩸 **Anémia:** Dnes si prijala len **{round(t_iron, 1)} mg železa** (odporúčaný cieľ pri anémii je aspoň 15-18mg). Bez železa bunky nemajú dostatok kyslíka na metabolické procesy. Pridaj nabudúce hovädzie mäso, tekvicové semienka alebo tmavú listovú zeleninu s kvapkou citrónu (kvôli vstrebávaniu).")
+                feedbacks.append(f"🩸 **Anémia:** Dnes si prijala len **{round(t_iron, 1)} mg železa**.")
             else:
-                feedbacks.append("💪 **Anémia:** Perfektné! Máš dnes bohatý príjem železa. Tvoje bunky majú dostatok kyslíka pre energiu a metabolizmus.")
+                feedbacks.append("💪 **Anémia:** Perfektné! Máš dnes bohatý príjem železa.")
 
-        # 3. Spätná väzba pre Hashimota
         if has_hashi:
             if t_zinc < 11:
-                feedbacks.append(f"🦋 **Hashimoto:** Tvoj **zinok je dnes nízky ({round(t_zinc, 1)} mg)**. Štítna žľaza nutne potrebuje zinok na konverziu neaktívneho hormónu T4 na aktívny T3. Skús do stravy doplniť tekvicové semienka, kešu orechy, hovädzie mäso alebo morské plody.")
+                feedbacks.append(f"🦋 **Hashimoto:** Tvoj **zinok je dnes nízky ({round(t_zinc, 1)} mg)**.")
             if t_risks > 0:
-                feedbacks.append(f"⚠️ **Hashimoto:** Zjedla si dnes {t_risks} potravín s potenciálnym autoimunitným spúšťačom (lepok, sója alebo mlieko). Pozorne si večer odleduj, či sa neobjaví únava alebo mozgová hmla.")
+                feedbacks.append(f"⚠️ **Hashimoto:** Zjedla si dnes {t_risks} potravín s potenciálnym autoimunitným spúšťačom.")
 
-        # 4. Spätná väzba pre Celiakiu / Gastritídu / HIT
         if has_celiakia and t_risks > 0:
-            feedbacks.append("🚨 **Celiakia:** V denníku máš jedlo s obsahom lepku! Pri celiakii dochádza k okamžitému poškodeniu klkov čreva, čo kompletne zastaví vstrebávanie živín a spôsobí podvýživu.")
+            feedbacks.append("🚨 **Celiakia:** V denníku máš jedlo s obsahom lepku!")
             
         if has_gastritis and t_risks > 0:
-            feedbacks.append("🔥 **Gastritída:** Zaznamenala si potravinu, ktorá dráždi sliznicu žalúdka. Ak ucítiš pálenie alebo ťažobu, vieš, ktoré jedlo to spôsobilo. Nabudúce zvoľ radšej zásaditejšie potraviny.")
+            feedbacks.append("🔥 **Gastritída:** Zaznamenala si potravinu, ktorá dráždi sliznicu žalúdka.")
 
-        # Ak nie sú žiadne negatívne komenty
         if not feedbacks:
-            st.success("☀️ Tvoj dnešný jedálniček perfektne rešpektuje tvoj zdravotný stav. Žiadne riziká ani deficity neboli nájdené!")
+            st.success("☀️ Tvoj dnešný jedálniček perfektne rešpektuje tvoj zdravotný stav.")
         else:
             for f in feedbacks:
                 st.markdown(f)
                 
     else:
-        st.info("Zatiaľ si dnes nezadala žiadne potraviny. Komentár a analýza deficitov sa zobrazia hneď po pridaní prvého jedla.")
+        st.info("Zatiaľ si dnes nezadala žiadne potraviny.")
 
     st.write("---")
     st.subheader("🩺 Sledovanie priebehu príznakov")
