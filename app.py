@@ -37,7 +37,7 @@ st.markdown("""
 @st.cache_data
 def load_data():
     # ⚠️ SEM VLOŽ SVOJU SKOPÍROVANÚ "RAW" LINKU Z KROKU 1:
-    url = "https://raw.githubusercontent.com/tomas-b/public-data/main/MyFoodData-Nutrition-Facts-SpreadSheet-Release-1-4.xlsx%20-%20SR%20Legacy%20and%20FNDDS.csv"
+    url = "https://github.com/ScrapyDuckStudio/metabolicky-asistent/blob/main/food_data.csv"
     
     df = pd.read_csv(url, skiprows=3)
     df.columns = df.columns.str.strip()
