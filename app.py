@@ -783,83 +783,78 @@ with tab1:
 # --- TAB 2: DAILY DIARY ---
    # --- TAB 2: DAILY DIARY ---
 with tab2:
-    st.header(txt("diary_hdr"))
 
-    lang = get_lang()
+        for label_key, value, key in symptom_groups[1]:
+            if st.checkbox(txt(label_key), key=key):
+                selected_symptoms.append(value)
+
+    with symptom_columns[2]:
+        st.markdown(txt("sym_subjective"))
+
+        energy_score = st.slider(
+            txt("sym_energy"),
+            min_value=1,
+            max_value=10,
+            value=7,
+            key="energy"
+        )
+
+        sleep_score = st.slider(
+            txt("sym_sleep"),
+            min_value=1,
+            max_value=10,
+            value=7,
+            key="sleep"
+        )
 
     # =====================================================
-    # HELPERS
+    # SAVE BUTTON
     # =====================================================
-    COLUMN_TRANSLATIONS = {
-        "SK": [
-            "Jedlo", "Gramy", "Kalórie", "Bielkoviny", "Tuky",
-            "Čisté Sacharidy", "Cukor", "Vláknina", "Železo",
-            "Zinok", "Riziko"
-        ],
-        "EN": [
-            "Food", "Grams", "Calories", "Protein", "Fat",
-            "Net Carbs", "Sugar", "Fiber", "Iron",
-            "Zinc", "Risk"
-        ]
-    }
+    if st.button(
+        txt("save_btn"),
+        use_container_width=True,
+        type="primary"
+    ):
 
-    def safe_sum(df, column_name):
-        return round(df.get(column_name, pd.Series(dtype=float)).sum(), 1)
+        diagnosis_map = {
+            "PCOS": has_pcos,
+            "Hashimoto": has_hashi,
+            "Anemia": has_anemia,
+            "Celiac": has_celiakia,
+            "Gout": has_gout,
+            "NAFLD": has_nafld
+        }
 
-    def show_metric_row(metrics):
-        cols = st.columns(len(metrics))
-        for col, metric in zip(cols, metrics):
-            col.metric(metric["label"], metric["value"])
-
-    def generate_feedback():
-        feedback = []
-
-        # Fiber
-        if has_pcos or has_db2:
-            feedback.append(
-                txt("fb_pcos_fiber_low")
-                if totals["fiber"] < 25
-                else txt("fb_pcos_fiber_ok")
-            )
-
-        # Sugar
-        if (has_pcos or has_db2 or has_nafld) and totals["sugar"] > 35:
-            feedback.append(txt("fb_pcos_sugar_high"))
-
-        # Iron
-        if has_anemia:
-            feedback.append(
-                txt("fb_anemia_iron_low").format(iron=totals["iron"])
-                if totals["iron"] < 15
-                else txt("fb_anemia_iron_ok")
-            )
-
-        # Hashimoto
-        if has_hashi:
-            if totals["zinc"] < 11:
-                feedback.append(
-                    txt("fb_hashi_zinc_low").format(zinc=totals["zinc"])
-                )
-
-            if totals["risks"] > 0:
-                feedback.append(
-                    txt("fb_hashi_risks").format(risks=int(totals["risks"]))
-                )
-
-        # Risk-sensitive conditions
-        risk_conditions = [
-            (has_celiakia, "fb_celiakia_risk"),
-            (has_gastritis, "fb_gastritis_risk"),
-            (has_gout, "fb_gout_risk")
+        diagnoses = [
+            diagnosis
+            for diagnosis, enabled in diagnosis_map.items()
+            if enabled
         ]
 
-        for condition, key in risk_conditions:
-            if condition and totals["risks"] > 0:
-                feedback.append(txt(key))
+        row_data = {
+            "Dátum": str(date.today()),
+            "Diagnózy": ", ".join(diagnoses) if diagnoses else "None",
+            "Cieľ": meta_goal,
+            "Váha (kg)": weight,
+            "Energia": energy_score,
+            "Spánok": sleep_score,
+            "Kalórie": totals["calories"],
+            "Sacharidy (g)": totals["carbs"],
+            "Voda (L)": water_total,
+            "Symptómy": ", ".join(selected_symptoms)
+            if selected_symptoms else "None"
+        }
 
-        # Water
-        feedback.append(
-        st.rerun()# --- TAB 3: LONG-TERM PROGRESS ---
+        save_history_row(row_data)
+
+        # Reset state
+        st.session_state.daily_meals = []
+        st.session_state.water_glasses = 0
+
+        st.success(txt("save_success"))
+        st.rerun()
+
+# --- TAB 3: LONG-TERM PROGRESS ---
 with tab3:
     st.header(txt("history_hdr"))
     h_df = load_history()
