@@ -684,7 +684,7 @@ if 'water_glasses' not in st.session_state:
 # Health conditions dict for warning detection
 health_conditions = {
     'has_pcos': has_pcos, 'has_hashi': has_hashi, 'has_db2': has_db2,
-    'has_anemia': anemia, 'has_celiakia': has_celiakia, 'has_hit': has_hit,
+    'has_anemia': has_anemia, 'has_celiakia': has_celiakia, 'has_hit': has_hit,
     'has_gastritis': has_gastritis, 'has_sibo': has_sibo, 'has_gout': has_gout,
     'has_kidney_stones': has_kidney_stones, 'has_gallbladder': has_gallbladder, 'has_nafld': has_nafld
 }
