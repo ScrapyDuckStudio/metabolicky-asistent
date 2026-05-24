@@ -96,7 +96,7 @@ TXT = {
         "weight": "Váha (kg):",
         "height": "Výška (cm):",
         "age": "Vek:",
-        "target_info": "🎯 **Tvoj cieľový príjem:**\n* **Kalórie:** {cal} kcal\n* **Bielkoviny:** {prot} g\n* **Čisté sacharidy:** {carbs} g\n* **Tuky:** {fat} g",
+        "target_info": "🎯 **Tvoj cieľový príjem:**\n* **Kalórie:** {cal} kcal\n* **Bielkoviny:** {prot} g\n* **Čisté sacharidy:** {carbs} g\n* **Tuky:** {fat} g\n* **Voda:** {water} L",
         "tabs": ["🍽️ Potravinový asistent", "📊 Dnešný denník", "📈 Dlhodobý vývoj"],
         "search_hdr": "🔍 Hľadať potravinu",
         "search_lbl": "Zadaj názov v slovenčine alebo angličtine:",
@@ -146,7 +146,12 @@ TXT = {
         "fb_gastritis_risk": "🔥 **Gastritída:** Zaznamenala si potravinu dráždiacu žalúdok.",
         "fb_gout_risk": "🦴 **Dna:** Pozor, jedlo s purínmi môže vyvolať bolesť.",
         "fb_perfect": "☀️ Tvoj dnešný jedálniček perfektne rešpektuje tvoj zdravotný stav.",
+        "fb_water_low": "💧 **Hydratácia:** Piješ príliš málo vody! Ciel je {target}L.",
+        "fb_water_ok": "💧 **Hydratácia:** Výborná úroveň pitia vody!",
         "no_meals": "Zatiaľ si nezadala žiadne potraviny.",
+        "water_hdr": "💧 Sledovanie hydratácie",
+        "water_intake": "Pohár vody (250ml):",
+        "water_total": "Celkovo vody dnes:",
         "symptoms_hdr": "🩺 Sledovanie príznakov",
         "sym_gain_fatigue": "**Symptómy príberania/Únavy:**",
         "sym_hunger": "Náhly vlčí hlad",
@@ -164,6 +169,12 @@ TXT = {
         "history_hdr": "📈 Dlhodobé sledovanie vývoja tela",
         "history_empty": "Žiadne historické záznamy neboli zatiaľ vytvorené.",
         "chart_title": "Graf: Pohyb telesnej hmotnosti (kg)",
+        "metabolism_status": "### 🧬 Stav metabolizmu:",
+        "metab_excellent": "✅ Vynikajúci! Tvoj metabolizmus je v poriadku.",
+        "metab_good": "😊 Dobré! Dnes si robila dobré rozhodnutia.",
+        "metab_warning": "⚠️ Pozor! Niektoré metriky si mimo cieľa.",
+        "metab_critical": "🚨 KRITICKÉ! Potrebuješ urgentne zmeniť svoj príjem.",
+        "metab_neutral": "😐 Neutrálny deň. Pokus sa zlepšiť.",
         "none": "Žiadne",
         "err_save": "Nepodarilo sa uložiť na server",
         "db_status_ok": "✅ Databáza úspešne spárovaná.",
@@ -200,7 +211,7 @@ TXT = {
         "weight": "Weight (kg):",
         "height": "Height (cm):",
         "age": "Age:",
-        "target_info": "🎯 **Your Target Intake:**\n* **Calories:** {cal} kcal\n* **Protein:** {prot} g\n* **Net Carbs:** {carbs} g\n* **Fat:** {fat} g",
+        "target_info": "🎯 **Your Target Intake:**\n* **Calories:** {cal} kcal\n* **Protein:** {prot} g\n* **Net Carbs:** {carbs} g\n* **Fat:** {fat} g\n* **Water:** {water} L",
         "tabs": ["🍽️ Food Assistant", "📊 Daily Diary", "📈 Long-term Progress"],
         "search_hdr": "🔍 Search Food",
         "search_lbl": "Enter name in Slovak or English:",
@@ -250,7 +261,12 @@ TXT = {
         "fb_gastritis_risk": "🔥 **Gastritis:** Stomach irritant logged.",
         "fb_gout_risk": "🦴 **Gout:** Purines can trigger joint pain.",
         "fb_perfect": "☀️ Your meal plan perfectly respects your health.",
+        "fb_water_low": "💧 **Hydration:** You're drinking too little water! Target is {target}L.",
+        "fb_water_ok": "💧 **Hydration:** Excellent water intake today!",
         "no_meals": "No foods logged yet today.",
+        "water_hdr": "💧 Hydration Tracking",
+        "water_intake": "Glass of water (250ml):",
+        "water_total": "Total water today:",
         "symptoms_hdr": "🩺 Symptom Tracking",
         "sym_gain_fatigue": "**Gain / Fatigue Symptoms:**",
         "sym_hunger": "Sudden ravenous hunger",
@@ -268,6 +284,12 @@ TXT = {
         "history_hdr": "📈 Long-term Body Progress",
         "history_empty": "No history logs created yet.",
         "chart_title": "Chart: Body Weight Progress (kg)",
+        "metabolism_status": "### 🧬 Metabolism Status:",
+        "metab_excellent": "✅ Excellent! Your metabolism is on track.",
+        "metab_good": "😊 Good! You made great choices today.",
+        "metab_warning": "⚠️ Caution! Some metrics are off target.",
+        "metab_critical": "🚨 CRITICAL! You need to urgently change your intake.",
+        "metab_neutral": "😐 Neutral day. Try to improve.",
         "none": "None",
         "err_save": "Failed to save to server",
         "db_status_ok": "✅ Food database linked.",
@@ -275,7 +297,65 @@ TXT = {
     }
 }
 
-HIST_COLS = ["Dátum", "Diagnózy", "Cieľ", "Váha (kg)", "Energia", "Spánok", "Kalórie", "Sacharidy (g)", "Symptómy"]
+HIST_COLS = ["Dátum", "Diagnózy", "Cieľ", "Váha (kg)", "Energia", "Spánok", "Kalórie", "Sacharidy (g)", "Voda (L)", "Symptómy"]
+
+# --- FUNCTION: Calculate water needs ---
+def calculate_water_target(weight, has_hyper=False, has_hypertension=False):
+    """Calculate daily water target based on body weight and conditions"""
+    base_water = weight * 0.033  # Basic formula: 33ml per kg
+    if has_hyper: base_water *= 1.2  # Hyperthyroidism increases sweating
+    if has_hypertension: base_water *= 1.1  # Hypertension needs more hydration
+    return round(base_water, 1)
+
+# --- FUNCTION: Calculate metabolism status emoticon ---
+def get_metabolism_status(t_cal, target_cal, t_carbs, target_carbs, t_prot, target_protein, 
+                         t_fiber, has_pcos, has_hashi, t_iron, t_zinc, t_risks, t_water, target_water):
+    """Determine overall metabolism status with emoticon"""
+    issues = 0
+    max_issues = 0
+    
+    # Calorie check
+    cal_margin = abs(t_cal - target_cal) / target_cal if target_cal > 0 else 0
+    if cal_margin > 0.15: issues += 1
+    max_issues += 1
+    
+    # Carbs check for PCOS/Diabetes
+    if has_pcos:
+        if t_fiber < 25: issues += 1
+        max_issues += 1
+    
+    # Protein check
+    prot_margin = abs(t_prot - target_protein) / target_protein if target_protein > 0 else 0
+    if prot_margin > 0.2: issues += 1
+    max_issues += 1
+    
+    # Hashimoto zinc check
+    if has_hashi and t_zinc < 11: 
+        issues += 1
+    max_issues += 1
+    
+    # Water check
+    water_margin = abs(t_water - target_water) / target_water if target_water > 0 else 0
+    if water_margin > 0.2: issues += 1
+    max_issues += 1
+    
+    # Risks check
+    if t_risks > 2: issues += 1
+    max_issues += 1
+    
+    # Calculate status
+    health_score = 1 - (issues / max_issues) if max_issues > 0 else 1
+    
+    if health_score >= 0.85:
+        return "✅", TXT[lang]["metab_excellent"]
+    elif health_score >= 0.70:
+        return "😊", TXT[lang]["metab_good"]
+    elif health_score >= 0.50:
+        return "⚠️", TXT[lang]["metab_warning"]
+    elif health_score >= 0.30:
+        return "🚨", TXT[lang]["metab_critical"]
+    else:
+        return "😐", TXT[lang]["metab_neutral"]
 
 # --- INTELIGENTNÉ NAČÍTANIE DATABÁZY POTRAVÍN ---
 @st.cache_data
@@ -389,7 +469,10 @@ carbs_percentage = 0.25 if (has_pcos or has_db2 or has_nafld) else 0.45
 target_carbs = round((target_cal * carbs_percentage) / 4)
 target_fat = round((target_cal * (1.0 - (carbs_percentage + 0.25))) / 9)
 
-st.sidebar.info(TXT[lang]["target_info"].format(cal=target_cal, prot=target_protein, carbs=target_carbs, fat=target_fat))
+# Calculate water target
+target_water = calculate_water_target(weight, has_hyper, has_hypertension)
+
+st.sidebar.info(TXT[lang]["target_info"].format(cal=target_cal, prot=target_protein, carbs=target_carbs, fat=target_fat, water=target_water))
 
 uploaded_file = None
 if not os.path.exists("food_data_en_sk.csv"):
@@ -403,10 +486,13 @@ df, is_real_db = load_data(uploaded_file)
 # --- HLAVNÉ ROZHRANIE ---
 tab1, tab2, tab3 = st.tabs(TXT[lang]["tabs"])
 
-t_cal, t_carbs, t_prot, t_sugar, t_fiber, t_iron, t_zinc, t_risks = 0, 0, 0, 0, 0, 0, 0, 0
+t_cal, t_carbs, t_prot, t_sugar, t_fiber, t_iron, t_zinc, t_risks, t_water = 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 if 'daily_meals' not in st.session_state:
     st.session_state.daily_meals = []
+
+if 'water_glasses' not in st.session_state:
+    st.session_state.water_glasses = 0
 
 with tab1:
     col_l, col_r = st.columns([2, 1], gap="large")
@@ -445,8 +531,8 @@ with tab1:
                 if has_celiakia or has_hashi:
                     if any(x in full_name_lower for x in ['wheat', 'barley', 'rye', 'flour', 'bread', 'gluten', 'psenica', 'jacmen', 'raz', 'muka', 'chlieb', 'lepok']): warnings.append(TXT[lang]["warn_gluten"])
                 if has_hashi and any(x in full_name_lower for x in ['milk', 'cheese', 'yogurt', 'cream', 'soy', 'mlieko', 'syr', 'jogurt', 'smotana', 'soja']): warnings.append(TXT[lang]["warn_milk"])
-                if has_hit and any(x in full_name_lower for x in ['tomato', 'spinach', 'avocado', 'eggplant', 'cheese', 'wine', 'vinegar', 'sauerkraut', 'fermented', 'shrimp', 'tuna', 'paradaj', 'spenat', 'avokado', 'baklazan', 'syr', 'vino', 'ocot', 'kapusta', 'ferment', 'krevet', 'tunia']): warnings.append(TXT[lang]["warn_hit"])
-                if (has_gastritis or has_sibo) and any(x in full_name_lower for x in ['chili', 'pepper', 'coffee', 'lemon', 'onion', 'garlic', 'fried', 'korenie', 'kava', 'citron', 'cesnak', 'cibula', 'vypraz']): warnings.append(TXT[lang]["warn_gastritis"])
+                if has_hit and any(x in full_name_lower for x in ['tomato', 'spinach', 'avocado', 'eggplant', 'cheese', 'wine', 'vinegar', 'sauerkraut', 'fermented', 'shrimp', 'tuna', 'paradaj', 'spenat', 'avokado', 'baklajan', 'vino', 'sirka', 'kysnuty', 'krevet', 'tuniak']): warnings.append(TXT[lang]["warn_hit"])
+                if (has_gastritis or has_sibo) and any(x in full_name_lower for x in ['chili', 'pepper', 'coffee', 'lemon', 'onion', 'garlic', 'fried', 'korenie', 'kava', 'citron', 'cesnak', 'cibula', 'vyprazane']): warnings.append(TXT[lang]["warn_gastritis"])
                 if has_gout and any(x in full_name_lower for x in ['beef', 'pork', 'liver', 'beer', 'shrimp', 'sardine', 'hovadz', 'bravcov', 'pecen', 'pivo', 'krevet', 'sardyn']): warnings.append(TXT[lang]["warn_purines"])
                 if has_kidney_stones and any(x in full_name_lower for x in ['spinach', 'rhubarb', 'chocolate', 'nuts', 'spenat', 'rebarbora', 'cokolada', 'orech']): warnings.append(TXT[lang]["warn_oxalates"])
                 if (has_gallbladder or has_nafld) and (fat > 15 or 'fried' in full_name_lower or 'vypraz' in full_name_lower): warnings.append(TXT[lang]["warn_high_fat"])
@@ -531,12 +617,32 @@ with tab2:
         if has_celiakia and t_risks > 0: feedbacks.append(TXT[lang]["fb_celiakia_risk"])
         if has_gastritis and t_risks > 0: feedbacks.append(TXT[lang]["fb_gastritis_risk"])
         if has_gout and t_risks > 0: feedbacks.append(TXT[lang]["fb_gout_risk"])
+        if t_water < target_water * 0.8: feedbacks.append(TXT[lang]["fb_water_low"].format(target=target_water))
+        else: feedbacks.append(TXT[lang]["fb_water_ok"])
 
         if not feedbacks: st.success(TXT[lang]["fb_perfect"])
         else:
             for f in feedbacks: st.info(f)
     else:
         st.info(TXT[lang]["no_meals"])
+
+    st.write("---")
+    st.subheader(TXT[lang]["water_hdr"])
+    
+    water_col1, water_col2, water_col3 = st.columns([1, 1, 1])
+    with water_col1:
+        if st.button(f"{TXT[lang]['water_intake']} 💧", use_container_width=True):
+            st.session_state.water_glasses += 1
+    with water_col2:
+        if st.button(f"➖ {TXT[lang]['none']}", use_container_width=True):
+            if st.session_state.water_glasses > 0:
+                st.session_state.water_glasses -= 1
+    with water_col3:
+        if st.button(f"🔄 {TXT[lang]['none']}", use_container_width=True):
+            st.session_state.water_glasses = 0
+    
+    t_water = st.session_state.water_glasses * 0.25
+    st.metric(TXT[lang]["water_total"], f"{t_water} / {target_water} L", delta=f"{round(target_water - t_water, 2)} L to target")
 
     st.write("---")
     st.subheader(TXT[lang]["symptoms_hdr"])
@@ -559,6 +665,14 @@ with tab2:
         sleep_score = st.slider(TXT[lang]["sym_sleep"], 1, 10, 7)
 
     st.write("") # Spacer
+    
+    # Display metabolism status
+    status_emoji, status_msg = get_metabolism_status(t_cal, target_cal, t_carbs, target_carbs, t_prot, target_protein, 
+                                                      t_fiber, has_pcos, has_hashi, t_iron, t_zinc, t_risks, t_water, target_water)
+    st.markdown(TXT[lang]["metabolism_status"])
+    st.markdown(f"### {status_emoji} {status_msg}")
+    
+    st.write("") # Spacer
     if st.button(TXT[lang]["save_btn"], use_container_width=True):
         diag_list = []
         if has_pcos: diag_list.append("PCOS")
@@ -577,10 +691,12 @@ with tab2:
             "Spánok": sleep_score,
             "Kalórie": round(t_cal, 1),
             "Sacharidy (g)": round(t_carbs, 1),
+            "Voda (L)": t_water,
             "Symptómy": ", ".join(s_list) if s_list else "Žiadne/None"
         }
         save_history_row(row_data)
         st.session_state.daily_meals = []
+        st.session_state.water_glasses = 0
         st.success(TXT[lang]["save_success"])
         st.rerun()
 
