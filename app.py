@@ -9,44 +9,45 @@ st.set_page_config(page_title="Metabolický Asistent & Inteligentný Kouč", lay
 HISTORY_FILE = "zdravotna_historia_global.csv"
 
 # --- JAZYKOVÝ SLOVNÍK (TRANSLATIONS) ---
+# Výber jazyka hneď na začiatku, aby bol prístupný pre celý zvyšok kódu
 lang = st.sidebar.radio("🌐 Jazyk / Language", ["SK", "EN"])
 
 TXT = {
     "SK": {
         "title": "🩺 Inteligentný Metabolický & Hormonálny Tracker",
-        "profile": "🧬 1. Výber zdravotného profilu",
+        "profile": "🧬 Krok 1: Zdravotný profil",
         
         # Kategórie ochorení
-        "gain_weight_tendency": "**Sklon k priberaniu / Blokácia chudnutia:**",
+        "gain_weight_tendency": "📉 Sklon k priberaniu / Blokácia chudnutia:",
         "pcos": "PCOS (Inzulínová rezistencia)",
         "hashi": "Hashimoto (Spomalený metabolizmus)",
         "db2": "Cukrovka 2. typu",
-        "anemia": "Anémia (Nedostatok železa/kyslíka)",
+        "anemia": "Anémia (Nedostatok železa)",
         "cushing": "Cushingov syndróm (Vysoký kortizol)",
-        "lepid": "Lipedém / Lymfedém (Zadržiavanie tuku/vody)",
+        "lepid": "Lipedém / Lymfedém",
         
-        "lose_weight_tendency": "**Sklon k chudnutiu / Problém pribrať:**",
+        "lose_weight_tendency": "📈 Sklon k chudnutiu / Problém pribrať:",
         "hyper": "Hypertyreóza (Zrýchlený metabolizmus)",
         "celiakia": "Celiakia / IBD (Porucha vstrebávania)",
-        "addison": "Addisonova choroba (Únava nadobličiek)",
+        "addison": "Addisonova choroba",
         
-        "digestion": "**Tráviace citlivosti & Intolerancie:**",
+        "digestion": "🍽️ Tráviace citlivosti & Intolerancie:",
         "hit": "HIT (Histamínová intolerancia)",
         "gastritis": "Gastritída (Zápal žalúdka)",
-        "sibo": "SIBO / IBS (Syndróm dráždivého čreva)",
-        "gallbladder": "Žlčníkové kamene / Dysfunkcia žlčníka",
+        "sibo": "SIBO / IBS (Dráždivé črevo)",
+        "gallbladder": "Žlčníkové kamene / Dysfunkcia",
         
-        "metabolic_syndromes": "**Metabolické & Orgánové poruchy:**",
+        "metabolic_syndromes": "🧬 Metabolické & Orgánové poruchy:",
         "gout": "Dna (Vysoká kyselina močová)",
-        "nafld": "Statuóza pečene (Sttukovatená pečeň / NAFLD)",
-        "hypertension": "Hypertenzia (Vysoký krvný tlak)",
-        "kidney_stones": "Obličkové kamene (Oxalátové/Urátové)",
+        "nafld": "Statuóza pečene (NAFLD)",
+        "hypertension": "Hypertenzia (Vysoký tlak)",
+        "kidney_stones": "Obličkové kamene",
         
         # Ciele a antropometria
-        "goal_hdr": "🎯 2. Tvoj cieľ",
+        "goal_hdr": "🎯 Krok 2: Tvoj cieľ",
         "goal_q": "Čo chceš dosiahnuť?",
         "goals": ["Zdravé chudnutie", "Udržanie váhy & Regenerácia", "Zdravé pribratie (Budovanie hmoty)"],
-        "antropo": "👤 3. Antropometrické údaje",
+        "antropo": "👤 Krok 3: Tvoje údaje",
         "weight": "Váha (kg):",
         "height": "Výška (cm):",
         "age": "Vek:",
@@ -55,7 +56,7 @@ TXT = {
         # Rozhranie tabov
         "tabs": ["🍽️ Potravinový asistent & Diagnostika", "📊 Dnešný denník & Inteligentný feedback", "📈 Dlhodobý vývoj"],
         "search_hdr": "🔍 Hľadať potravinu",
-        "search_lbl": "Zadaj názov v slovenčine alebo angličtine (napr. hovädzie, beef, špenát, oats):",
+        "search_lbl": "Zadaj názov v slovenčine alebo angličtine (napr. hovädzie, beef, špenát):",
         "select_food": "Vyber potravinu:",
         "grams": "Gramáž (g):",
         "analysis": "#### 📊 Analýza pre {g}g:",
@@ -107,7 +108,7 @@ TXT = {
         "fb_hashi_zinc_low": "🦋 **Hashimoto:** Tvoj **zinok je dnes nízky ({zinc} mg)**.",
         "fb_hashi_risks": "⚠️ **Hashimoto:** Zjedla si dnes {risks} potravín s potenciálnym autoimunitným spúšťačom.",
         "fb_celiakia_risk": "🚨 **Celiakia:** V denníku máš jedlo s obsahom lepku!",
-        "fb_gastritis_risk": "🔥 **Gastritída:** Zaznamenala si potravinu, ktorá dráždi sliznicu žalúdka.",
+        "fb_gastritis_risk": "🔥 **Gastritída:** Zaznamenala si potravinu, ktorá dráždi sliznicu žalústka.",
         "fb_gout_risk": "🦴 **Dna:** Pozor, jedlo s vysokým obsahom purínov môže vyvolať akútnu bolesť kĺbov.",
         "fb_perfect": "☀️ Tvoj dnešný jedálniček perfektne rešpektuje tvoj zdravotný stav.",
         "no_meals": "Zatiaľ si dnes nezadala žiadne potraviny.",
@@ -135,43 +136,43 @@ TXT = {
         "none": "Žiadne",
         "err_save": "Nepodarilo sa uložiť na server",
         "db_status_ok": "✅ Databáza úspešne spárovaná.",
-        "db_status_upload": "📁 Databáza nenájdená na serveri. Nahraj 'food_data_en_sk.csv' tu:"
+        "db_status_upload": "📁 Databáza nenájdená. Nahraj 'food_data_en_sk.csv' tu:"
     },
     "EN": {
         "title": "🩺 Smart Metabolic & Hormonal Tracker",
-        "profile": "🧬 1. Select Health Profile",
+        "profile": "🧬 Step 1: Health Profile",
         
         # Disease Categories
-        "gain_weight_tendency": "**Weight Gain Tendency / Weight Loss Block:**",
+        "gain_weight_tendency": "📉 Weight Gain Tendency / Weight Loss Block:",
         "pcos": "PCOS (Insulin Resistance)",
         "hashi": "Hashimoto (Slow Metabolism)",
         "db2": "Type 2 Diabetes",
-        "anemia": "Anemia (Iron/Oxygen Deficiency)",
+        "anemia": "Anemia (Iron Deficiency)",
         "cushing": "Cushing's Syndrome (High Cortisol)",
-        "lepid": "Lipedema / Lymphedema (Fat/Water Retention)",
+        "lepid": "Lipedema / Lymphedema",
         
-        "lose_weight_tendency": "**Weight Loss Tendency / Problem Gaining:**",
+        "lose_weight_tendency": "📈 Weight Loss Tendency / Problem Gaining:",
         "hyper": "Hyperthyroidism (Fast Metabolism)",
         "celiakia": "Celiac Disease / IBD (Malabsorption)",
-        "addison": "Addison's Disease (Adrenal Fatigue)",
+        "addison": "Addison's Disease",
         
-        "digestion": "**Digestive Sensitivities & Intolerances:**",
+        "digestion": "🍽️ Digestive Sensitivities & Intolerances:",
         "hit": "HIT (Histamine Intolerance)",
         "gastritis": "Gastritis (Stomach Inflammation)",
         "sibo": "SIBO / IBS (Irritable Bowel)",
         "gallbladder": "Gallbladder Stones / Dysfunction",
         
-        "metabolic_syndromes": "**Metabolic & Organ Disorders:**",
+        "metabolic_syndromes": "🧬 Metabolic & Organ Disorders:",
         "gout": "Gout (High Uric Acid)",
         "nafld": "Fatty Liver Disease (NAFLD)",
         "hypertension": "Hypertension (High Blood Pressure)",
-        "kidney_stones": "Kidney Stones (Oxalate/Urate)",
+        "kidney_stones": "Kidney Stones",
         
         # Goals and Anthropometrics
-        "goal_hdr": "🎯 2. Your Goal",
+        "goal_hdr": "🎯 Step 2: Your Goal",
         "goal_q": "What do you want to achieve?",
         "goals": ["Healthy Weight Loss", "Weight Maintenance & Recovery", "Healthy Weight Gain (Bulking)"],
-        "antropo": "👤 3. Anthropometric Data",
+        "antropo": "👤 Step 3: Your Data",
         "weight": "Weight (kg):",
         "height": "Height (cm):",
         "age": "Age:",
@@ -180,7 +181,7 @@ TXT = {
         # Tabs UI
         "tabs": ["🍽️ Food Assistant & Diagnostics", "📊 Daily Diary & Smart Feedback", "📈 Long-term Progress"],
         "search_hdr": "🔍 Search Food",
-        "search_lbl": "Enter name in Slovak or English (e.g. hovävzie, beef, spinach, oats):",
+        "search_lbl": "Enter name in Slovak or English (e.g. hovävzie, beef, spinach):",
         "select_food": "Select food:",
         "grams": "Weight (g):",
         "analysis": "#### 📊 Analysis for {g}g:",
@@ -259,8 +260,8 @@ TXT = {
         "chart_title": "Chart: Body Weight Progress (kg)",
         "none": "None",
         "err_save": "Failed to save to server",
-        "db_status_ok": "✅ Food database linked successfully.",
-        "db_status_upload": "📁 Database file not found on repository. Upload 'food_data_en_sk.csv' here:"
+        "db_status_ok": "✅ Food database linked.",
+        "db_status_upload": "📁 Database not found. Upload 'food_data_en_sk.csv' here:"
     }
 }
 
@@ -319,65 +320,50 @@ def save_history_row(row_dict):
     except Exception as e:
         st.error(f"{TXT[lang]['err_save']}: {e}")
 
-# --- PRÍPRAVA BOČNÉHO PANELU ---
-st.sidebar.header(TXT[lang]["profile"])
-
-# 1. SKLON K PRIBERANIU
-st.sidebar.markdown(TXT[lang]["gain_weight_tendency"])
-has_pcos = st.sidebar.checkbox(TXT[lang]["pcos"], value=False)
-has_hashi = st.sidebar.checkbox(TXT[lang]["hashi"], value=False)
-has_db2 = st.sidebar.checkbox(TXT[lang]["db2"], value=False)
-has_anemia = st.sidebar.checkbox(TXT[lang]["anemia"], value=False)
-has_cushing = st.sidebar.checkbox(TXT[lang]["cushing"], value=False)
-has_lipedema = st.sidebar.checkbox(TXT[lang]["lepid"], value=False)
-
-# 2. SKLON K CHUDNUTIU
-st.sidebar.markdown(TXT[lang]["lose_weight_tendency"])
-has_hyper = st.sidebar.checkbox(TXT[lang]["hyper"], value=False)
-has_celiakia = st.sidebar.checkbox(TXT[lang]["celiakia"], value=False)
-has_addison = st.sidebar.checkbox(TXT[lang]["addison"], value=False)
-
-# 3. TRÁVIACE CITLIVOSTI
-st.sidebar.markdown(TXT[lang]["digestion"])
-has_hit = st.sidebar.checkbox(TXT[lang]["hit"], value=False)
-has_gastritis = st.sidebar.checkbox(TXT[lang]["gastritis"], value=False)
-has_sibo = st.sidebar.checkbox(TXT[lang]["sibo"], value=False)
-has_gallbladder = st.sidebar.checkbox(TXT[lang]["gallbladder"], value=False)
-
-# 4. METABOLICKÉ A ORGÁNOVÉ SYNDRÓMY
-st.sidebar.markdown(TXT[lang]["metabolic_syndromes"])
-has_gout = st.sidebar.checkbox(TXT[lang]["gout"], value=False)
-has_nafld = st.sidebar.checkbox(TXT[lang]["nafld"], value=False)
-has_hypertension = st.sidebar.checkbox(TXT[lang]["hypertension"], value=False)
-has_kidney_stones = st.sidebar.checkbox(TXT[lang]["kidney_stones"], value=False)
-
+# --- REORGANIZOVANÝ BOČNÝ PANEL (KROKY POD ŠÍPKAMI) ---
 st.sidebar.write("---")
 
-# Uploader databázy
-uploaded_file = None
-if not os.path.exists("food_data_en_sk.csv"):
-    st.sidebar.warning(TXT[lang]["db_status_upload"])
-    uploaded_file = st.sidebar.file_uploader("", type=["csv"])
-else:
-    st.sidebar.success(TXT[lang]["db_status_ok"])
+# KROK 1: Zdravotný profil
+with st.sidebar.expander(TXT[lang]["profile"], expanded=True):
+    st.markdown(f"<small>{TXT[lang]['gain_weight_tendency']}</small>", unsafe_allow_html=True)
+    has_pcos = st.checkbox(TXT[lang]["pcos"], value=False)
+    has_hashi = st.checkbox(TXT[lang]["hashi"], value=False)
+    has_db2 = st.checkbox(TXT[lang]["db2"], value=False)
+    has_anemia = st.checkbox(TXT[lang]["anemia"], value=False)
+    has_cushing = st.checkbox(TXT[lang]["cushing"], value=False)
+    has_lipedema = st.checkbox(TXT[lang]["lepid"], value=False)
 
-df, is_real_db = load_data(uploaded_file)
+    st.markdown(f"<small>{TXT[lang]['lose_weight_tendency']}</small>", unsafe_allow_html=True)
+    has_hyper = st.checkbox(TXT[lang]["hyper"], value=False)
+    has_celiakia = st.checkbox(TXT[lang]["celiakia"], value=False)
+    has_addison = st.checkbox(TXT[lang]["addison"], value=False)
 
-st.sidebar.write("---")
-st.sidebar.header(TXT[lang]["goal_hdr"])
-meta_goal = st.sidebar.radio(TXT[lang]["goal_q"], TXT[lang]["goals"])
+    st.markdown(f"<small>{TXT[lang]['digestion']}</small>", unsafe_allow_html=True)
+    has_hit = st.checkbox(TXT[lang]["hit"], value=False)
+    has_gastritis = st.checkbox(TXT[lang]["gastritis"], value=False)
+    has_sibo = st.checkbox(TXT[lang]["sibo"], value=False)
+    has_gallbladder = st.checkbox(TXT[lang]["gallbladder"], value=False)
 
-st.sidebar.write("---")
-st.sidebar.header(TXT[lang]["antropo"])
-weight = st.sidebar.number_input(TXT[lang]["weight"], min_value=30.0, value=70.0, step=0.1)
-height = st.sidebar.number_input(TXT[lang]["height"], min_value=120, value=165)
-age = st.sidebar.number_input(TXT[lang]["age"], min_value=15, value=30)
+    st.markdown(f"<small>{TXT[lang]['metabolic_syndromes']}</small>", unsafe_allow_html=True)
+    has_gout = st.checkbox(TXT[lang]["gout"], value=False)
+    has_nafld = st.checkbox(TXT[lang]["nafld"], value=False)
+    has_hypertension = st.checkbox(TXT[lang]["hypertension"], value=False)
+    has_kidney_stones = st.checkbox(TXT[lang]["kidney_stones"], value=False)
 
-# Výpočet metabolických cieľov s ohľadom na nové diagnózy
+# KROK 2: Tvoj cieľ
+with st.sidebar.expander(TXT[lang]["goal_hdr"], expanded=False):
+    meta_goal = st.radio(TXT[lang]["goal_q"], TXT[lang]["goals"], label_visibility="collapsed")
+
+# KROK 3: Antropometrické údaje
+with st.sidebar.expander(TXT[lang]["antropo"], expanded=False):
+    weight = st.number_input(TXT[lang]["weight"], min_value=30.0, value=70.0, step=0.1)
+    height = st.number_input(TXT[lang]["height"], min_value=120, value=165)
+    age = st.number_input(TXT[lang]["age"], min_value=15, value=30)
+
+# Výpočet metabolických cieľov
 bmr = round(447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age))
 base_maintenance = round(bmr * 1.2)
 
-# Úprava kalórií pri špecifických ochoreniach (napr. Cushing spomaľuje, Addison zvyšuje potrebu energie)
 if has_cushing: base_maintenance = round(base_maintenance * 0.9)
 if has_addison: base_maintenance = round(base_maintenance * 1.1)
 
@@ -388,9 +374,8 @@ elif meta_goal in ["Zdravé pribratie (Budovanie hmoty)", "Healthy Weight Gain (
 else:
     target_cal = base_maintenance
 
-# Proteíny a makrá upravené podľa záťaže orgánov
 if has_gout or has_kidney_stones:
-    target_protein = round(weight * 1.2) # Pri dne nepreťažujeme obličky bielkovinami
+    target_protein = round(weight * 1.2)
 elif has_hyper or meta_goal in ["Zdravé pribratie (Budovanie hmoty)", "Healthy Weight Gain (Bulking)"]:
     target_protein = round(weight * 1.8)
 else:
@@ -402,8 +387,17 @@ target_fat = round((target_cal * (1.0 - (carbs_percentage + 0.25))) / 9)
 
 st.sidebar.info(TXT[lang]["target_info"].format(cal=target_cal, prot=target_protein, carbs=target_carbs, fat=target_fat))
 
-if 'daily_meals' not in st.session_state:
-    st.session_state.daily_meals = []
+# --- SPRÁVA DATABÁZY NA SPODKU BOČNÉHO PANELA ---
+st.sidebar.write("---")
+uploaded_file = None
+if not os.path.exists("food_data_en_sk.csv"):
+    st.sidebar.warning(TXT[lang]["db_status_upload"])
+    uploaded_file = st.sidebar.file_uploader("", type=["csv"])
+else:
+    st.sidebar.caption(TXT[lang]["db_status_ok"])
+
+df, is_real_db = load_data(uploaded_file)
+
 
 # --- HLAVNÉ ROZHRANIE APPky ---
 st.title(TXT[lang]["title"])
@@ -411,6 +405,9 @@ st.title(TXT[lang]["title"])
 tab1, tab2, tab3 = st.tabs(TXT[lang]["tabs"])
 
 t_cal, t_carbs, t_prot, t_sugar, t_fiber, t_iron, t_zinc, t_risks = 0, 0, 0, 0, 0, 0, 0, 0
+
+if 'daily_meals' not in st.session_state:
+    st.session_state.daily_meals = []
 
 with tab1:
     col_l, col_r = st.columns([2, 1])
@@ -447,7 +444,6 @@ with tab1:
                 full_name_lower = f"{food_details['name_en']} {food_details['name_sk']}".lower()
                 warnings = []
                 
-                # --- ALERGÉNY A CHOROBNÉ KRÍŽENIA ---
                 if has_celiakia or has_hashi:
                     if any(x in full_name_lower for x in ['wheat', 'barley', 'rye', 'flour', 'bread', 'gluten', 'psenica', 'jacmen', 'raz', 'muka', 'chlieb', 'lepok']):
                         warnings.append(TXT[lang]["warn_gluten"])
@@ -470,7 +466,6 @@ with tab1:
                 if (has_gallbladder or has_nafld) and (fat > 15 or 'fried' in full_name_lower or 'vypraz' in full_name_lower):
                     warnings.append(TXT[lang]["warn_high_fat"])
 
-                # --- ZOBRAZENIE DIAGOSTIKY ---
                 st.write(TXT[lang]["analysis"].format(g=grams))
                 c1, c2, c3, c4 = st.columns(4)
                 c1.metric(TXT[lang]["cal"], f"{cal} kcal")
