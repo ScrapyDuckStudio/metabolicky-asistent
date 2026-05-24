@@ -185,7 +185,7 @@ HIST_COLS = ["Dátum", "Diagnózy", "Cieľ", "Váha (kg)", "Energia", "Spánok",
 @st.cache_data
 def load_data():
     # Načítanie tvojho reálneho súboru s preskočením úvodných riadkov MyFoodData
-    file_name = "food_data_en_sk.csv"
+    file_name = "food_data.csv"
     try:
         df = pd.read_csv(file_name, skiprows=3)
         df.columns = df.columns.str.strip()
