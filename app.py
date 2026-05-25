@@ -996,16 +996,19 @@ with tab2:
         active_diagnoses = [diag for diag, active in diagnosis_map.items() if active]
         
         row_data = {
-            "Dátum": str(date.today()),
-            "Diagnózy": ", ".join(active_diagnoses) if active_diagnoses else "None",
-            "Cieľ": meta_goal,
-            "Váha (kg)": weight,
-            "Energia": energy_score,
-            "Spánok": sleep_score,
-            "Kalórie": totals["calories"],
-            "Sacharidy (g)": totals["carbs"],
-            "Voda (L)": water_total,
-            "Symptómy": ", ".join(selected_symptoms) if selected_symptoms else "None"
+             "Dátum": str(date.today()),
+             "Diagnózy": ", ".join(active_diagnoses) if active_diagnoses else "None",
+             "Cieľ": meta_goal,
+             "Váha (kg)": weight,
+             "Energia": energy_score,
+             "Spánok": sleep_score,
+             "Kalórie": totals["calories"],
+             "Sacharidy (g)": totals["carbs"],
+             "Voda (L)": water_total,
+             "Symptómy": ", ".join(selected_symptoms) if selected_symptoms else "None"
+         }
+         save_history_row(row_data)
+         st.success(txt("save_success"))
 # --- TAB 4: SHOPPING CART ---
 with tab4:
     st.markdown(f"<h3 style='color: #059669;'>🛒 {txt('tabs')[3]}</h3>", unsafe_allow_html=True)
