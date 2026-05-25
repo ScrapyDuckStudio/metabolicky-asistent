@@ -16,161 +16,308 @@ st.set_page_config(
 # ==================== CUSTOM PREMIUM STYLING ====================
 CUSTOM_CSS = """
 <style>
-    /* Google Fonts Import for clean aesthetics */
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    /* ===== Premium Wellness UI Theme ===== */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-    html, body, [data-testid="stAppViewContainer"] {
-        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background-color: #fcfdfd;
-    }
-    
-    /* Global design tokens for Health & Balance Theme */
     :root {
-        --primary-health: #059669; /* Emerald Green */
-        --primary-glow: #10b981;
-        --accent-balance: #0d9488; /* Calm Teal */
-        --energy-orange: #f59e0b; /* Warm Amber */
-        --alert-coral: #f43f5e; /* Soft Coral Red */
-        --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #f0fdfa 100%);
+        --bg: #f4fbf8;
+        --surface: rgba(255,255,255,0.82);
+        --surface-strong: #ffffff;
+
+        --primary: #0f766e;
+        --primary-light: #14b8a6;
+        --primary-dark: #115e59;
+
+        --success: #059669;
+        --warning: #f59e0b;
+        --danger: #f43f5e;
+
+        --text-main: #0f172a;
+        --text-soft: #5b6b73;
+
+        --border: rgba(15, 118, 110, 0.10);
+
+        --shadow-sm: 0 4px 14px rgba(15, 118, 110, 0.05);
+        --shadow-md: 0 12px 32px rgba(15, 118, 110, 0.08);
+        --shadow-lg: 0 18px 48px rgba(15, 118, 110, 0.14);
+
+        --radius-lg: 22px;
+        --radius-md: 16px;
+        --radius-sm: 12px;
     }
 
-    /* Elegant sidebar custom styling */
+    /* ===== Global App Styling ===== */
+    html, body, [data-testid="stAppViewContainer"] {
+        font-family: 'Inter', sans-serif;
+        background:
+            radial-gradient(circle at top left, rgba(20,184,166,0.08), transparent 30%),
+            radial-gradient(circle at bottom right, rgba(5,150,105,0.08), transparent 30%),
+            var(--bg);
+        color: var(--text-main);
+    }
+
+    .main .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    /* ===== Sidebar ===== */
     [data-testid="stSidebar"] {
-        background-color: #f7faf9;
-        border-right: 1px solid rgba(5, 150, 105, 0.08);
+        background: rgba(255,255,255,0.75);
+        backdrop-filter: blur(18px);
+        border-right: 1px solid var(--border);
     }
-    
-    /* Styled headings with gradient accents */
-    h1, h2, h3 {
-        color: #0f2d24 !important;
-        font-weight: 700 !important;
+
+    [data-testid="stSidebar"] * {
+        color: var(--text-main);
     }
-    
-    /* Smooth buttons with fluid energy gradient */
-    .stButton > button {
-        border-radius: 14px !important;
-        background: linear-gradient(135deg, #059669 0%, #0d9488 100%) !important;
-        color: white !important;
-        border: none !important;
-        padding: 12px 26px !important;
-        font-weight: 600 !important;
-        font-size: 15px !important;
-        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        box-shadow: 0 4px 14px rgba(13, 148, 136, 0.18) !important;
-    }
-    
-    .stButton > button:hover {
-        background: linear-gradient(135deg, #0d9488 0%, #059669 100%) !important;
-        box-shadow: 0 6px 20px rgba(5, 150, 105, 0.3) !important;
-        transform: translateY(-2px) !important;
-    }
-    
-    .stButton > button:active {
-        transform: translateY(0px) !important;
-    }
-    
-    /* Premium health metrics styling */
-    div[data-testid="metric-container"] {
-        background: var(--bg-gradient);
-        border: 1px solid rgba(13, 148, 136, 0.12) !important;
-        padding: 22px !important;
-        border-radius: 20px !important;
-        box-shadow: 0 10px 30px rgba(13, 148, 136, 0.03) !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    div[data-testid="metric-container"]:hover {
-        border-color: rgba(5, 150, 105, 0.3) !important;
-        box-shadow: 0 12px 28px rgba(5, 150, 105, 0.08) !important;
-        transform: translateY(-3px);
-    }
-    
-    [data-testid="stMetricValue"] {
-        font-size: 2.2rem !important;
-        color: #0d9488 !important;
+
+    /* ===== Typography ===== */
+    h1 {
+        font-size: 3rem !important;
         font-weight: 800 !important;
-        letter-spacing: -1px;
+        letter-spacing: -2px;
+        color: var(--text-main) !important;
+        margin-bottom: 0.3rem;
+    }
+
+    h2 {
+        font-size: 1.8rem !important;
+        font-weight: 700 !important;
+        color: var(--text-main) !important;
+    }
+
+    h3 {
+        font-size: 1.2rem !important;
+        font-weight: 700 !important;
+        color: var(--text-main) !important;
+    }
+
+    p, label, span {
+        color: var(--text-soft);
+    }
+
+    /* ===== Buttons ===== */
+    .stButton > button {
+        border: none !important;
+        border-radius: 999px !important;
+        padding: 0.8rem 1.6rem !important;
+
+        background: linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-light)
+        ) !important;
+
+        color: white !important;
+        font-weight: 700 !important;
+        font-size: 0.95rem !important;
+
+        box-shadow: var(--shadow-md);
+        transition: all 0.28s ease;
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-2px) scale(1.01);
+        box-shadow: var(--shadow-lg);
+        filter: brightness(1.03);
+    }
+
+    .stButton > button:active {
+        transform: scale(0.98);
+    }
+
+    /* ===== Metric Cards ===== */
+    div[data-testid="metric-container"] {
+        background: var(--surface);
+        backdrop-filter: blur(16px);
+
+        border: 1px solid rgba(255,255,255,0.5);
+        border-radius: var(--radius-lg);
+
+        padding: 1.4rem !important;
+
+        box-shadow: var(--shadow-sm);
+
+        transition: all 0.3s ease;
+    }
+
+    div[data-testid="metric-container"]:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+        border-color: rgba(20,184,166,0.25);
     }
 
     [data-testid="stMetricLabel"] {
-        color: #3f6257 !important;
+        font-size: 0.95rem !important;
         font-weight: 600 !important;
+        color: var(--text-soft) !important;
     }
-    
-    /* Elevated and sleek custom tabs */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 12px;
-        background-color: transparent;
-        border-bottom: 2px solid rgba(5, 150, 105, 0.08);
-        padding-bottom: 4px;
+
+    [data-testid="stMetricValue"] {
+        font-size: 2.4rem !important;
+        font-weight: 800 !important;
+        color: var(--primary) !important;
+        letter-spacing: -2px;
     }
-    
-    .stTabs [data-baseweb="tab"] {
-        height: 52px;
-        border-radius: 12px 12px 0px 0px;
-        padding: 12px 24px;
-        font-weight: 600;
-        color: #627d74;
-        transition: all 0.25s ease;
-    }
-    
-    .stTabs [aria-selected="true"] {
-        background-color: rgba(13, 148, 136, 0.07) !important;
-        color: #0d9488 !important;
-        border-top: 3px solid #0d9488 !important;
-        border-radius: 12px 12px 0px 0px;
-    }
-    
-    /* Input fields luxury borders and soft focus effects */
+
+    /* ===== Inputs ===== */
     .stTextInput > div > div > input,
     .stNumberInput > div > div > input,
+    .stTextArea textarea,
     .stSelectbox > div > div {
-        border-radius: 12px !important;
-        border: 2px solid rgba(13, 148, 136, 0.12) !important;
-        padding: 11px 14px !important;
-        background-color: #ffffff !important;
+        background: rgba(255,255,255,0.9) !important;
+
+        border: 1.5px solid rgba(15,118,110,0.12) !important;
+        border-radius: var(--radius-md) !important;
+
+        padding: 0.8rem 1rem !important;
+
         transition: all 0.25s ease !important;
     }
-    
+
     .stTextInput > div > div > input:focus,
-    .stNumberInput > div > div > input:focus {
-        border-color: #0d9488 !important;
-        box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.08) !important;
+    .stNumberInput > div > div > input:focus,
+    .stTextArea textarea:focus {
+        border-color: var(--primary-light) !important;
+        box-shadow: 0 0 0 5px rgba(20,184,166,0.12) !important;
     }
-    
-    /* Alert cards custom visual styling */
+
+    /* ===== Tabs ===== */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 0.6rem;
+        background: transparent;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(15,118,110,0.08);
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        background: transparent;
+        border-radius: 14px;
+        color: var(--text-soft);
+
+        font-weight: 600;
+        height: 52px;
+
+        padding: 0 1.2rem;
+
+        transition: all 0.25s ease;
+    }
+
+    .stTabs [data-baseweb="tab"]:hover {
+        background: rgba(20,184,166,0.08);
+        color: var(--primary);
+    }
+
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(
+            135deg,
+            rgba(20,184,166,0.15),
+            rgba(15,118,110,0.08)
+        ) !important;
+
+        color: var(--primary) !important;
+
+        box-shadow: inset 0 0 0 1px rgba(20,184,166,0.18);
+    }
+
+    /* ===== Alerts ===== */
     .stAlert {
-        border-radius: 16px !important;
-        border: 1px solid rgba(13, 148, 136, 0.08) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01) !important;
-    }
-    
-    .stAlert [data-testid="stNotificationContent"] {
-        color: #1e3d33 !important;
+        border-radius: var(--radius-md) !important;
+        border: none !important;
+
+        background: rgba(255,255,255,0.85) !important;
+        backdrop-filter: blur(12px);
+
+        box-shadow: var(--shadow-sm);
     }
 
-    /* Expander styling for clean layouts */
+    /* ===== Expanders ===== */
     .streamlit-expanderHeader {
-        background-color: #ffffff !important;
-        border: 1px solid rgba(5, 150, 105, 0.06) !important;
-        border-radius: 12px !important;
-        padding: 12px !important;
-        font-weight: 600 !important;
-        color: #0f2d24 !important;
+        background: rgba(255,255,255,0.85) !important;
+
+        border-radius: var(--radius-md) !important;
+        border: 1px solid var(--border) !important;
+
+        padding: 1rem !important;
+
+        font-weight: 700 !important;
+        color: var(--text-main) !important;
+
+        transition: all 0.25s ease;
     }
 
-    /* Elegant custom card backgrounds */
+    .streamlit-expanderHeader:hover {
+        border-color: rgba(20,184,166,0.22) !important;
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* ===== Cards ===== */
     .health-card {
-        background: #ffffff;
-        border-radius: 18px;
-        padding: 24px;
-        border: 1px solid rgba(13, 148, 136, 0.08);
-        box-shadow: 0 8px 24px rgba(13, 148, 136, 0.02);
+        background: rgba(255,255,255,0.84);
+        backdrop-filter: blur(18px);
+
+        border-radius: 24px;
+
+        padding: 1.6rem;
+
+        border: 1px solid rgba(255,255,255,0.55);
+
+        box-shadow: var(--shadow-md);
+
+        transition: all 0.3s ease;
+    }
+
+    .health-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    /* ===== Scrollbar ===== */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(15,118,110,0.18);
+        border-radius: 999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(15,118,110,0.32);
+    }
+
+    /* ===== Dataframes ===== */
+    .stDataFrame {
+        border-radius: 18px !important;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* ===== Animations ===== */
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .element-container {
+        animation: fadeUp 0.4s ease;
     }
 </style>
 """
-st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
+st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 # ==================== TRANSLATIONS ====================
 TRANSLATIONS = {
     "SK": {
