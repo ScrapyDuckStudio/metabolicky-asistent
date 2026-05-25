@@ -5,33 +5,6 @@ import os
 from functools import lru_cache
 from fpdf import FPDF
 
-FONT_PATH = "DejaVuSans.ttf"  # Put this TTF file in your project root
-
-pdf = FPDF()
-pdf.add_page()
-
-# Add a Unicode font (you must have the TTF file!)
-if not os.path.isfile(FONT_PATH):
-    # Download or package the font if missing, or fallback with a warning
-    st.warning("Missing font DejaVuSans.ttf for Unicode PDF export. Please add it to your project.")
-else:
-    pdf.add_font('DejaVu', '', FONT_PATH, uni=True)
-    pdf.set_font("DejaVu", size=16)
-    pdf.cell(200, 10, txt="Nákupný zoznam", ln=True, align='C')
-    pdf.ln(10)
-    pdf.set_font("DejaVu", size=12)
-    for item in st.session_state.shopping_list:
-        pdf.cell(200, 10, txt=f"- {item}", ln=True)
-
-    # Output as bytes
-    pdf_output = pdf.output(dest='S').encode('latin-1', errors='replace')
-    st.download_button(
-        label="📥 Exportovať do PDF",
-        data=pdf_output,
-        file_name="nakupny_zoznam.pdf",
-        mime="application/pdf"
-    )
-
 # ==================== PAGE CONFIGURATION ====================
 st.set_page_config(
     page_title="Metabolický Asistent & Inteligentný Kouč",
@@ -1100,19 +1073,24 @@ with tab4:
             # PDF Generation
             pdf = FPDF()
             pdf.add_page()
-            pdf.set_font("Arial", 'B', 16)
-            pdf.cell(200, 10, txt="Nakupny zoznam", ln=True, align='C')
-            pdf.ln(10)
-            pdf.set_font("Arial", size=12)
-            for item in st.session_state.shopping_list:
-                pdf.cell(200, 10, txt=f"- {item}", ln=True)
+            FONT_PATH = "DejaVuSans.ttf"  # Make sure this file is in your repo!
+            if not os.path.isfile(FONT_PATH):
+                st.warning("Missing font DejaVuSans.ttf for Unicode PDF export. Please add it to your project.")
+            else:
+                pdf.add_font('DejaVu', '', FONT_PATH, uni=True)
+                pdf.set_font("DejaVu", size=16)
+                pdf.cell(200, 10, txt="Nákupný zoznam", ln=True, align='C')
+                pdf.ln(10)
+                pdf.set_font("DejaVu", size=12)
+                for item in st.session_state.shopping_list:
+                    pdf.cell(200, 10, txt=f"- {item}", ln=True)
             
-            st.download_button(
-                label="📥 Exportovať do PDF",
-                data=pdf.output(dest='S').encode('latin-1'),
-                file_name="nakupny_zoznam.pdf",
-                mime="application/pdf"
-            )
+                st.download_button(
+                    label="📥 Exportovať do PDF",
+                    data=pdf.output(dest='S').encode('latin-1', errors='replace'),
+                    file_name="nakupny_zoznam.pdf",
+                    mime="application/pdf"
+                )
             if st.button("🗑️ Vyčistiť košík"):
                 st.session_state.shopping_list = []
                 st.rerun()
