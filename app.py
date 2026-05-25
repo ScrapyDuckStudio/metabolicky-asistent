@@ -12,10 +12,15 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ==================== CUSTOM STYLING ====================
+# ==================== CUSTOM PREMIUM STYLING ====================
 CUSTOM_CSS = """
 <style>
-    /* Primary color scheme */
+    /* Premium modern system font & global improvements */
+    html, body, [data-testid="stAppViewContainer"] {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    /* Primary color palette variables */
     :root {
         --primary-color: #2ecc71;
         --primary-hover: #27ae60;
@@ -24,103 +29,125 @@ CUSTOM_CSS = """
         --warning-color: #f39c12;
     }
     
-    /* Smooth button styling */
+    /* Smooth button styling with subtle glowing shadows */
     .stButton > button {
-        border-radius: 8px;
-        background-color: #2ecc71 !important;
+        border-radius: 12px !important;
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%) !important;
         color: white !important;
-        border: none;
-        padding: 12px 24px;
-        font-weight: 600;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 2px 8px rgba(46, 204, 113, 0.2);
+        border: none !important;
+        padding: 14px 28px !important;
+        font-weight: 600 !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 4px 15px rgba(46, 204, 113, 0.25) !important;
     }
     
     .stButton > button:hover {
-        background-color: #27ae60 !important;
-        box-shadow: 0 4px 16px rgba(46, 204, 113, 0.4);
-        transform: translateY(-2px);
+        background: linear-gradient(135deg, #27ae60 0%, #219653 100%) !important;
+        box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4) !important;
+        transform: translateY(-2px) !important;
     }
     
     .stButton > button:active {
-        transform: translateY(0px);
+        transform: translateY(0px) !important;
     }
     
-    /* Metric cards - theme adaptive */
+    /* Secondary/Action buttons (e.g. Save, secondary options) */
+    button[data-testid="baseButton-primary"] {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.25) !important;
+    }
+    
+    /* Premium glassmorphism card widgets */
     div[data-testid="metric-container"] {
-        background: linear-gradient(135deg, rgba(52, 152, 219, 0.08) 0%, rgba(52, 152, 219, 0.03) 100%);
-        border: 1px solid rgba(52, 152, 219, 0.2);
-        padding: 16px;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
+        background: linear-gradient(135deg, rgba(52, 152, 219, 0.08) 0%, rgba(52, 152, 219, 0.02) 100%);
+        border: 1px solid rgba(52, 152, 219, 0.15) !important;
+        padding: 20px !important;
+        border-radius: 16px !important;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04) !important;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+        backdrop-filter: blur(4px);
     }
     
     div[data-testid="metric-container"]:hover {
-        border-color: rgba(52, 152, 219, 0.4);
-        box-shadow: 0 4px 16px rgba(52, 152, 219, 0.1);
+        border-color: rgba(52, 152, 219, 0.4) !important;
+        box-shadow: 0 12px 24px rgba(52, 152, 219, 0.12) !important;
+        transform: translateY(-3px);
     }
     
     [data-testid="stMetricValue"] {
-        font-size: 1.8rem !important;
+        font-size: 2.1rem !important;
         color: #3498db !important;
-        font-weight: 700;
+        font-weight: 800 !important;
+        letter-spacing: -0.5px;
     }
     
-    /* Tab styling */
+    /* Clean, elevated tab styling */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 12px;
+        gap: 16px;
         background-color: transparent;
+        border-bottom: 2px solid rgba(200, 200, 200, 0.15);
+        padding-bottom: 4px;
     }
     
     .stTabs [data-baseweb="tab"] {
-        height: 50px;
-        border-radius: 8px 8px 0px 0px;
-        padding: 10px 20px;
-        font-weight: 500;
-        transition: all 0.2s ease;
+        height: 52px;
+        border-radius: 10px 10px 0px 0px;
+        padding: 12px 24px;
+        font-weight: 600;
+        color: #7f8c8d;
+        transition: all 0.3s ease;
     }
     
     .stTabs [aria-selected="true"] {
-        background-color: rgba(52, 152, 219, 0.1);
-        border-top: 3px solid #3498db;
+        background-color: rgba(52, 152, 219, 0.08) !important;
+        color: #3498db !important;
+        border-top: 3px solid #3498db !important;
+        border-radius: 10px 10px 0px 0px;
     }
     
-    /* Expander styling */
-    .streamlit-expanderHeader {
-        border-radius: 8px;
-    }
-    
-    /* Input field styling */
+    /* Input fields luxury borders and shadow effects */
     .stTextInput > div > div > input,
-    .stNumberInput > div > div > input {
-        border-radius: 8px !important;
-        border: 2px solid rgba(52, 152, 219, 0.2) !important;
-        padding: 10px 12px !important;
+    .stNumberInput > div > div > input,
+    .stSelectbox > div > div {
+        border-radius: 10px !important;
+        border: 2px solid rgba(52, 152, 219, 0.15) !important;
+        padding: 12px 14px !important;
+        background-color: transparent !important;
+        transition: all 0.25s ease !important;
     }
     
     .stTextInput > div > div > input:focus,
     .stNumberInput > div > div > input:focus {
         border-color: #3498db !important;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1) !important;
+        box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.12) !important;
     }
     
-    /* Alert styling */
+    /* Custom Alert callout cards */
     .stAlert {
-        border-radius: 8px;
-        padding: 12px 16px;
+        border-radius: 12px !important;
+        border-left: 6px solid #3498db !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
     }
     
-    /* Dataframe styling */
-    .streamlit-table {
-        border-radius: 8px;
-        overflow: hidden;
+    /* Elegant sidebars with rich background style */
+    [data-testid="stSidebar"] {
+        background-color: #fafbfc;
+        border-right: 1px solid rgba(0,0,0,0.05);
     }
     
-    /* Divider */
+    /* Premium styling for expanding panels */
+    .streamlit-expanderHeader {
+        background-color: rgba(255,255,255,0.4) !important;
+        border: 1px solid rgba(0,0,0,0.05) !important;
+        border-radius: 10px !important;
+        padding: 12px !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Divider enhancements */
     hr {
-        margin: 2rem 0 !important;
-        border-color: rgba(200, 200, 200, 0.2);
+        margin: 2.5rem 0 !important;
+        opacity: 0.15;
     }
 </style>
 """
@@ -153,11 +180,16 @@ TRANSLATIONS = {
         "gastritis": "Gastritída (Zápal žalúdka)",
         "sibo": "SIBO / IBS (Dráždivé črevo)",
         "gallbladder": "Žlčníkové kamene / Dysfunkcia",
-        "metabolic_syndromes": "🧬 Metabolické & Orgánové poruchy:",
+        "metabolic_syndromes": "🧬 Metabolické, Orgánové & Hormonálne poruchy:",
         "gout": "Dna (Vysoká kyselina močová)",
         "nafld": "Statuóza pečene (NAFLD)",
         "hypertension": "Hypertenzia (Vysoký tlak)",
         "kidney_stones": "Obličkové kamene",
+        "adrenal_fatigue": "Adrenálna únava (Chronický stres)",
+        "leaky_gut": "Leaky Gut (Priepustné črevo)",
+        "candida": "Premnožená Candida (Mykózy)",
+        "menopause": "Perimenopauza / Menopauza",
+        "osteo": "Osteoporóza / Osteopénia",
         
         # Goals
         "goals": ["Zdravé chudnutie", "Udržanie váhy & Regenerácia", "Zdravé pribratie (Budovanie hmoty)"],
@@ -169,7 +201,7 @@ TRANSLATIONS = {
         "target_info": "🎯 **Tvoj cieľový príjem:**\n* **Kalórie:** {cal} kcal\n* **Bielkoviny:** {prot} g\n* **Čisté sacharidy:** {carbs} g\n* **Tuky:** {fat} g\n* **Voda:** {water} L",
         
         # Tabs
-        "tabs": ["🍽️ Potravinový asistent", "📊 Dnešný denník", "📈 Dlhodobý vývoj", "Nakupny kosik"],
+        "tabs": ["🍽️ Potravinový asistent", "📊 Dnešný denník", "📈 Dlhodobý vývoj", "🛒 Nákupný košík"],
         
         # Food search
         "search_hdr": "🔍 Hľadať potravinu",
@@ -192,6 +224,9 @@ TRANSLATIONS = {
         "warn_purines": "🥩 **Vysoké puríny (Dna):** Riziko záchvatu dny a zvýšenia kyseliny močovej.",
         "warn_oxalates": "🌱 **Vysoké oxaláty:** Nebezpečenstvo vzniku obličkových kameňov.",
         "warn_high_fat": "🧈 **Vysoký obsah tuku:** Môže podráždiť žlčník alebo zhoršiť steatózu pečene.",
+        "warn_candida": "🍄 **Candida:** Vysoký obsah jednoduchých cukrov podporuje kvasinky.",
+        "warn_leaky_gut": "🛡️ **Leaky Gut:** Pozor na dráždivé bielkoviny (lepok/mlieko).",
+        "warn_osteo": "🦴 **Osteoporóza:** Kofeín a fosfáty môžu zhoršovať vstrebávanie vápnika.",
         
         # Actions
         "add_btn": "➕ Pridať do dňa",
@@ -222,13 +257,15 @@ TRANSLATIONS = {
         "fb_pcos_sugar_high": "🚨 **PCOS/Pečeň:** Pozor, cukor prekročil bezpečnú hranicu (nad 35g).",
         "fb_anemia_iron_low": "🩸 **Anémia:** Dnes si prijala len {iron} mg železa.",
         "fb_anemia_iron_ok": "💪 **Anémia:** Perfektné! Máš bohatý príjem železa.",
-        "fb_hashi_zinc_low": "🦋 **Hashimoto:** Tvoj zinok je dnes nízky ({zinc} mg).",
+        "fb_hashi_zinc_low": "🦋 **Hashimoto:** Tvoj zinok je dnes nízky ({zinc} mg). Pre optimálnu syntézu hormónov štítnej žľazy a podporu štruktúry svalov by si mal prijať **11 až 15 mg zinku denne**.",
+        "fb_hashi_zinc_ok": "✨ **Hashimoto:** Skvelé, tvoj príjem zinku je dostatočný pre tvoj metabolizmus.",
         "fb_hashi_risks": "⚠️ **Hashimoto:** Zjedla si dnes {risks} potravín so spúšťačom.",
         "fb_celiakia_risk": "🚨 **Celiakia:** V denníku máš jedlo s obsahom lepku!",
         "fb_gastritis_risk": "🔥 **Gastritída:** Zaznamenala si potravinu dráždiacu žalúdok.",
         "fb_gout_risk": "🦴 **Dna:** Pozor, jedlo s purínmi môže vyvolať bolesť.",
         "fb_perfect": "☀️ Tvoj dnešný jedálniček perfektne rešpektuje tvoj zdravotný stav.",
         "fb_water_low": "💧 **Hydratácia:** Piješ príliš málo vody! Ciel je {target}L.",
+        "fb_water_high": "⚠️ **Nadmerná hydratácia:** Piješ príliš veľa vody! (Dnes už {water}L). Nadmerný jednorazový alebo dlhodobý nadbytočný príjem vody (nad {limit}L denne) môže extrémne preťažiť obličky a viesť k nebezpečnému vyplaveniu sodíka a ďalších dôležitých minerálov z tela (hyponatriémia).",
         "fb_water_ok": "💧 **Hydratácia:** Výborná úroveň pitia vody!",
         "no_meals": "📭 Zatiaľ si nezadala žiadne potraviny.",
         
@@ -267,7 +304,7 @@ TRANSLATIONS = {
         "metab_neutral": "😐 Neutrálny deň. Pokus sa zlepšiť.",
         
         # Database
-        "none": "Žiadne",
+        "none": "None",
         "err_save": "❌ Nepodarilo sa uložiť na server",
         "db_status_ok": "✅ Databáza úspešne spárovaná.",
         "db_status_upload": "📁 Databáza nenájdená. Nahraj 'food_data_en_sk.csv':"
@@ -297,11 +334,16 @@ TRANSLATIONS = {
         "gastritis": "Gastritis",
         "sibo": "SIBO / IBS",
         "gallbladder": "Gallbladder Issues",
-        "metabolic_syndromes": "🧬 Metabolic & Organ Disorders:",
+        "metabolic_syndromes": "🧬 Metabolic, Organ & Hormonal Disorders:",
         "gout": "Gout (High Uric Acid)",
         "nafld": "Fatty Liver (NAFLD)",
         "hypertension": "Hypertension",
         "kidney_stones": "Kidney Stones",
+        "adrenal_fatigue": "Adrenal Fatigue (Chronic Stress)",
+        "leaky_gut": "Leaky Gut Syndrome",
+        "candida": "Candida Overgrowth",
+        "menopause": "Perimenopause / Menopause",
+        "osteo": "Osteoporosis / Osteopenia",
         
         # Goals
         "goals": ["Healthy Weight Loss", "Weight Maintenance & Recovery", "Healthy Weight Gain (Bulking)"],
@@ -313,7 +355,7 @@ TRANSLATIONS = {
         "target_info": "🎯 **Your Target Intake:**\n* **Calories:** {cal} kcal\n* **Protein:** {prot} g\n* **Net Carbs:** {carbs} g\n* **Fat:** {fat} g\n* **Water:** {water} L",
         
         # Tabs
-        "tabs": ["🍽️ Food Assistant", "📊 Daily Diary", "📈 Long-term Progress", "Shopping cart"],
+        "tabs": ["🍽️ Food Assistant", "📊 Daily Diary", "📈 Long-term Progress", "🛒 Shopping Cart"],
         
         # Food search
         "search_hdr": "🔍 Search Food",
@@ -336,6 +378,9 @@ TRANSLATIONS = {
         "warn_purines": "🥩 **High Purines (Gout):** Risk of attack.",
         "warn_oxalates": "🌱 **High Oxalates:** Risk of stones.",
         "warn_high_fat": "🧈 **High Fat:** May worsen gallbladder/NAFLD.",
+        "warn_candida": "🍄 **Candida:** High simple sugars feed yeast.",
+        "warn_leaky_gut": "🛡️ **Leaky Gut:** Beware of irritating proteins (gluten/dairy).",
+        "warn_osteo": "🦴 **Osteoporosis:** Caffeine and phosphates can impair calcium absorption.",
         
         # Actions
         "add_btn": "➕ Add to Day",
@@ -366,13 +411,15 @@ TRANSLATIONS = {
         "fb_pcos_sugar_high": "🚨 **PCOS/NAFLD:** Sugar exceeded limit (>35g).",
         "fb_anemia_iron_low": "🩸 **Anemia:** Only {iron} mg of iron consumed.",
         "fb_anemia_iron_ok": "💪 **Anemia:** Rich iron intake today.",
-        "fb_hashi_zinc_low": "🦋 **Hashimoto:** Zinc is low ({zinc} mg).",
+        "fb_hashi_zinc_low": "🦋 **Hashimoto:** Your zinc is low ({zinc} mg). For optimal thyroid hormone synthesis and muscle support, aim for **11 to 15 mg of zinc daily**.",
+        "fb_hashi_zinc_ok": "✨ **Hashimoto:** Great! Zinc levels are ideal for your metabolism.",
         "fb_hashi_risks": "⚠️ **Hashimoto:** You ate {risks} foods with triggers.",
         "fb_celiakia_risk": "🚨 **Celiac:** Gluten-containing food logged!",
         "fb_gastritis_risk": "🔥 **Gastritis:** Stomach irritant logged.",
         "fb_gout_risk": "🦴 **Gout:** Purines can trigger joint pain.",
         "fb_perfect": "☀️ Your meal plan perfectly respects your health.",
         "fb_water_low": "💧 **Hydration:** You're drinking too little water! Target is {target}L.",
+        "fb_water_high": "⚠️ **Overhydration Warning:** You are drinking too much water! (Currently {water}L). Consuming too much water (over {limit}L per day) can strain your kidneys and lead to dangerous electrolyte loss (hyponatremia).",
         "fb_water_ok": "💧 **Hydration:** Excellent water intake today!",
         "no_meals": "📭 No foods logged yet today.",
         
@@ -557,6 +604,9 @@ def detect_food_warnings(food_name: str, health_conditions: dict) -> list:
     purine_keywords = ['beef', 'pork', 'liver', 'beer', 'shrimp', 'sardine', 'hovadz', 'bravcov', 'pecen', 'pivo', 'krevet', 'sardyn']
     oxalate_keywords = ['spinach', 'rhubarb', 'chocolate', 'nuts', 'spenat', 'rebarbora', 'cokolada', 'orech']
     
+    candida_keywords = ['sugar', 'cukor', 'fruit', 'ovocie', 'honey', 'med', 'sirup', 'syrup', 'chocolate', 'cokolada']
+    osteo_keywords = ['caffeine', 'coffee', 'kava', 'soda', 'cola', 'energy', 'limonada']
+    
     if (health_conditions.get('has_celiakia') or health_conditions.get('has_hashi')) and any(x in name_lower for x in gluten_keywords):
         warnings.append(txt("warn_gluten"))
     
@@ -574,6 +624,15 @@ def detect_food_warnings(food_name: str, health_conditions: dict) -> list:
     
     if health_conditions.get('has_kidney_stones') and any(x in name_lower for x in oxalate_keywords):
         warnings.append(txt("warn_oxalates"))
+        
+    if health_conditions.get('has_candida') and any(x in name_lower for x in candida_keywords):
+        warnings.append(txt("warn_candida"))
+        
+    if health_conditions.get('has_leaky_gut') and any(x in name_lower for x in gluten_keywords + dairy_keywords):
+        warnings.append(txt("warn_leaky_gut"))
+        
+    if health_conditions.get('has_osteo') and any(x in name_lower for x in osteo_keywords):
+        warnings.append(txt("warn_osteo"))
     
     return warnings
 
@@ -620,6 +679,11 @@ with st.sidebar:
         has_nafld = st.checkbox(txt("nafld"), key="nafld")
         has_hypertension = st.checkbox(txt("hypertension"), key="hypertension")
         has_kidney_stones = st.checkbox(txt("kidney_stones"), key="kidney_stones")
+        has_adrenal = st.checkbox(txt("adrenal_fatigue"), key="adrenal")
+        has_leaky_gut = st.checkbox(txt("leaky_gut"), key="leaky_gut")
+        has_candida = st.checkbox(txt("candida"), key="candida")
+        has_menopause = st.checkbox(txt("menopause"), key="menopause")
+        has_osteo = st.checkbox(txt("osteo"), key="osteo")
     
     # Goal
     with st.expander(txt("goal_hdr"), expanded=False):
@@ -657,7 +721,7 @@ with st.sidebar:
     else:
         target_protein = round(weight * 1.5)
     
-    carbs_percentage = 0.25 if (has_pcos or has_db2 or has_nafld) else 0.45
+    carbs_percentage = 0.25 if (has_pcos or has_db2 or has_nafld or has_candida) else 0.45
     target_carbs = round((target_cal * carbs_percentage) / 4)
     target_fat = round((target_cal * (1.0 - (carbs_percentage + 0.25))) / 9)
     target_water = calculate_water_target(weight, has_hyper, has_hypertension)
@@ -686,7 +750,9 @@ health_conditions = {
     'has_pcos': has_pcos, 'has_hashi': has_hashi, 'has_db2': has_db2,
     'has_anemia': has_anemia, 'has_celiakia': has_celiakia, 'has_hit': has_hit,
     'has_gastritis': has_gastritis, 'has_sibo': has_sibo, 'has_gout': has_gout,
-    'has_kidney_stones': has_kidney_stones, 'has_gallbladder': has_gallbladder, 'has_nafld': has_nafld
+    'has_kidney_stones': has_kidney_stones, 'has_gallbladder': has_gallbladder, 'has_nafld': has_nafld,
+    'has_adrenal': has_adrenal, 'has_leaky_gut': has_leaky_gut, 'has_candida': has_candida,
+    'has_menopause': has_menopause, 'has_osteo': has_osteo
 }
 
 # ==================== MAIN TABS ====================
@@ -744,7 +810,7 @@ with tab1:
                     for warning in warnings:
                         st.warning(warning)
                 
-                if (has_pcos or has_db2 or has_nafld) and sugar > 10:
+                if (has_pcos or has_db2 or has_nafld or has_candida) and sugar > 10:
                     st.error(txt("warn_sugar"))
                 
                 if st.button(txt("add_btn"), use_container_width=True):
@@ -897,9 +963,7 @@ with tab2:
 
     st.divider()
 
-    # =====================================================
-    # FEEDBACK
-    # =====================================================
+    # ==================== FEEDBACK & WATER EXTREME CHECK ====================
     st.subheader(txt("feedback_hdr"))
 
     feedbacks = []
@@ -910,7 +974,7 @@ with tab2:
         else:
             feedbacks.append(txt("fb_pcos_fiber_ok"))
 
-    if (has_pcos or has_db2 or has_nafld) and totals["sugar"] > 35:
+    if (has_pcos or has_db2 or has_nafld or has_candida) and totals["sugar"] > 35:
         feedbacks.append(txt("fb_pcos_sugar_high"))
 
     if has_anemia:
@@ -923,20 +987,33 @@ with tab2:
         else:
             feedbacks.append(txt("fb_anemia_iron_ok"))
 
-    if has_hashi and totals["zinc"] < 11:
-        feedbacks.append(
-            txt("fb_hashi_zinc_low").format(
-                zinc=totals["zinc"]
+    # Updated Hashimoto feedback for Zinc including recommended target
+    if has_hashi:
+        if totals["zinc"] < 11:
+            feedbacks.append(
+                txt("fb_hashi_zinc_low").format(
+                    zinc=totals["zinc"]
+                )
             )
-        )
+        else:
+            feedbacks.append(txt("fb_hashi_zinc_ok"))
 
     if has_gout and totals["risks"] > 0:
         feedbacks.append(txt("fb_gout_risk"))
 
+    # Water overhydration / underhydration dynamic checks
+    water_upper_limit = round(max(4.5, target_water + 1.5), 1)
     if water_total < target_water * 0.8:
         feedbacks.append(
             txt("fb_water_low").format(
                 target=target_water
+            )
+        )
+    elif water_total > water_upper_limit:
+        feedbacks.append(
+            txt("fb_water_high").format(
+                water=water_total,
+                limit=water_upper_limit
             )
         )
     else:
@@ -945,8 +1022,14 @@ with tab2:
     if not feedbacks:
         feedbacks.append(txt("fb_perfect"))
 
+    # Render dynamic feedback items
     for feedback in feedbacks:
-        st.info(feedback)
+        if "⚠️" in feedback or "🚨" in feedback:
+            st.warning(feedback)
+        elif "✨" in feedback or "☀️" in feedback or "💪" in feedback:
+            st.success(feedback)
+        else:
+            st.info(feedback)
 
     st.divider()
 
@@ -1020,7 +1103,12 @@ with tab2:
             "Anemia": has_anemia,
             "Celiac": has_celiakia,
             "Gout": has_gout,
-            "NAFLD": has_nafld
+            "NAFLD": has_nafld,
+            "Adrenal Fatigue": has_adrenal,
+            "Leaky Gut": has_leaky_gut,
+            "Candida": has_candida,
+            "Menopause": has_menopause,
+            "Osteoporosis": has_osteo
         }
 
         diagnoses = [
@@ -1062,60 +1150,138 @@ with tab3:
         st.line_chart(h_df.set_index("Dátum")["Váha (kg)"])
     else:
         st.info(txt("history_empty"))
-# --- TAB 4: NÁKUPNÝ PORADCA ---
+
+# --- TAB 4: SHOPPING ADVISOR WITH MULTI-CONDITION FILTERS ---
 with tab4:
-    st.header("🛒 Nákupný poradca")
-    st.write("Potraviny vybrané na mieru tvojim diagnózam a aktuálnym deficitom:")
-
-    # Rozšírená databáza potravín s benefitmi (pridaj ich koľko chceš)
-    RECOMMENDATIONS = {
-        "Zinok": [
-            ("Tekvicové semienka", "Vysoký obsah zinku pre štítnu žľazu"),
-            ("Hovädzie mäso", "Výborný zdroj zinku a železa"),
-            ("Sezamové semienka", "Bohaté na zinok"),
-            ("Kešu orechy", "Zinok a zdravé tuky")
-        ],
-        "Železo": [
-            ("Špenát", "Vysoký obsah železa a kyseliny listovej"),
-            ("Šošovica", "Železo pre podporu pri anémii"),
-            ("Pečeň", "Najlepší zdroj vstrebateľného železa"),
-            ("Tekvicové semienka", "Kombinácia zinku a železa")
-        ],
-        "Vláknina": [
-            ("Chia semienka", "Vláknina pre inzulínovú citlivosť"),
-            ("Avokádo", "Vláknina a zdravé tuky"),
-            ("Maliny", "Nízky glykemický index, vysoká vláknina"),
-            ("Ľanové semienka", "Podpora trávenia")
-        ]
-    }
-
-    # Logika výberu
-    shopping_suggestions = []
+    st.header("🛒 " + txt("tabs")[3])
     
-    # Pridaj návrhy podľa deficitov
-    if has_hashi and totals["zinc"] < 11:
-        shopping_suggestions.extend(RECOMMENDATIONS["Zinok"])
-    if has_anemia and totals["iron"] < 15:
-        shopping_suggestions.extend(RECOMMENDATIONS["Železo"])
-    if (has_pcos or has_db2) and totals["fiber"] < 25:
-        shopping_suggestions.extend(RECOMMENDATIONS["Vláknina"])
+    # Information on how these foods are recommended
+    st.write(
+        "Odporúčaný nákupný zoznam s ohľadom na tvoj zdravotný stav, "
+        "potenciálne deficity a metabolické požiadavky. Ak trpíš **Histamínovou intoleranciou (HIT)**, "
+        "alebo autoimunitnou poruchou ako **Hashimoto** či **Celiakia**, filter automaticky vyradí "
+        "potenciálne problémové alebo zápalové položky (napr. mliečne výrobky a ryby)."
+    )
 
-    # Odstránenie duplicitných návrhov
-    unique_suggestions = list(set(shopping_suggestions))
+    # Enhanced food recommendations database with classification tags
+    # Structure: (Food Name, Benefit Description, Category, is_fish, is_dairy)
+    RECOMMENDATIONS_DB = [
+        # Zinok
+        ("Tekvicové semienka", "Rastlinný zinok na optimalizáciu funkcie štítnej žľazy.", "Zinok", False, False),
+        ("Hovädzie mäso", "Vysoko dostupný prírodný zinok a hemové železo.", "Zinok", False, False),
+        ("Sezamové semienka", "Vynikajúci zdroj zinku, medi a zdravých lipidov.", "Zinok", False, False),
+        ("Kešu orechy", "Zinok s horčíkom pre zmiernenie adrenálneho zaťaženia.", "Zinok", False, False),
+        ("Cícer", "Strukovina s bohatým zastúpením zinku a rastlinného proteínu.", "Zinok", False, False),
+        
+        # Železo
+        ("Špenát", "Neehemové železo, kyselina listová a dôležité elektrolyty.", "Železo", False, False),
+        ("Šošovica", "Skvelý zdroj pomalých karbohydrátov a nehemového železa.", "Železo", False, False),
+        ("Hovädzia pečeň", "Najvstrebateľnejšie železo, aktívny vitamín A a komplex B.", "Železo", False, False),
+        ("Quinoa", "Ľahko stráviteľná bezlepková plodina bohatá na kovy a proteín.", "Železo", False, False),
+        ("Mak siaty", "Výborná dodávka rastlinného železa spojená s vápnikom.", "Železo", False, False),
+        
+        # Vláknina
+        ("Chia semienka", "Rozpustná vláknina stabilizujúca hladinu krvnej glukózy.", "Vláknina", False, False),
+        ("Avokádo", "Vláknina kombinovaná s mononenasýtenými mastnými kyselinami.", "Vláknina", False, False),
+        ("Maliny", "Minimum cukru a maximum prebiotických vlákninových zložiek.", "Vláknina", False, False),
+        ("Ľanové semienka", "Slizové látky pre regeneráciu črevnej steny.", "Vláknina", False, False),
+        ("Brokolica", "Zlúčeniny podporujúce pečeň a vysoké množstvo vlákniny.", "Vláknina", False, False),
+        ("Bezlepkové ovsené vločky", "Beta-glukány pre optimalizáciu inzulínovej senzitivity.", "Vláknina", False, False),
+
+        # Vitamín D (Dôležité pre metabolizmus vápnika a hormonálny balans)
+        ("Vaječné žĺtka", "Prírodný D3 spolu s cholínom na podporu pečene.", "Vitamín D", False, False),
+        ("Divoký losos", "Vynikajúci zdroj biologicky aktívneho vitamínu D3 (Vyradené pri HIT).", "Vitamín D", True, False),
+        ("Sardinky v oleji", "Zdroj vápnika a aktívneho D3 (Vyradené pri HIT).", "Vitamín D", True, False),
+        ("Šampiňóny ožiarené UV", "Rastlinný zdroj vitamínu D2 pre zdravý kostný aparát.", "Vitamín D", False, False),
+        ("Tresčia pečeň", "Koncentrovaný zdroj vitamínu D3 a omega-3 lipidov (Vyradené pri HIT).", "Vitamín D", True, False),
+
+        # Vitamín B12 (Dôležité pre bunkový cyklus a prevenciu chronickej únavy)
+        ("Hovädzie mäso", "Vynikajúci zdroj B12 pre bunkový metabolizmus a nervový systém.", "Vitamín B12", False, False),
+        ("Lahôdkové droždie", "Špičkový, prirodzene bezlepkový a vegánsky zdroj B12.", "Vitamín B12", False, False),
+        ("Kuracie prsia", "Dostupný chudý proteín s vysokým podielom niacínu a B12.", "Vitamín B12", False, False),
+        ("Tuniak vo vlastnej šťave", "Kvalitný B12 a čistá bielkovina (Vyradené pri HIT).", "Vitamín B12", True, False),
+        ("Kefír", "Kultivované probiotikum obohatené o prirodzený B12 (Vyradené pri mliečnej citlivosti).", "Vitamín B12", False, True)
+    ]
+
+    # Decide recommended categories based on health status and diary inputs
+    suggested_categories = []
+    
+    # Add from diary deficits
+    if has_hashi and totals["zinc"] < 11:
+        suggested_categories.append("Zinok")
+    if has_anemia and totals["iron"] < 15:
+        suggested_categories.append("Železo")
+    if (has_pcos or has_db2) and totals["fiber"] < 25:
+        suggested_categories.append("Vláknina")
+        
+    # Standard supportive recommendations for hormonal and chronic conditions (Vitamin D)
+    if has_hashi or has_pcos or has_db2 or has_osteo or has_menopause or has_adrenal or has_cushing:
+        suggested_categories.append("Vitamín D")
+        
+    # For absorption issues and blood health (Vitamin B12)
+    if has_celiakia or has_leaky_gut or has_sibo or has_anemia or has_gastritis:
+        suggested_categories.append("Vitamín B12")
+
+    # If no conditions or deficits are met, suggest core baseline pillars
+    if not suggested_categories:
+        suggested_categories = ["Vitamín D", "Vitamín B12", "Vláknina"]
+
+    # Filter recommendations based on sensitivities
+    filtered_suggestions = []
+    for food, benefit, category, is_fish, is_dairy in RECOMMENDATIONS_DB:
+        if category in suggested_categories:
+            # Exclude fish/seafood for Histamine Intolerance (HIT)
+            if is_fish and has_hit:
+                continue
+            # Exclude dairy for Hashimoto or Celiac Disease to prevent molecular mimicry / gut irritation
+            if is_dairy and (has_hashi or has_celiakia):
+                continue
+            
+            filtered_suggestions.append((food, benefit, category))
+
+    # Remove duplicates
+    unique_suggestions = []
+    seen = set()
+    for item in filtered_suggestions:
+        if item[0] not in seen:
+            seen.add(item[0])
+            unique_suggestions.append(item)
 
     if unique_suggestions:
         if 'shopping_list' not in st.session_state:
             st.session_state.shopping_list = []
 
-        for food, reason in unique_suggestions:
-            col_a, col_b = st.columns([0.1, 0.9])
-            if col_a.checkbox("", key=f"chk_{food}"):
+        st.subheader("📋 Odporúčané potraviny pre teba:")
+        for food, benefit, category in unique_suggestions:
+            col_a, col_b = st.columns([0.08, 0.92])
+            
+            # Select item checkbox
+            is_checked = col_a.checkbox("", key=f"shop_{food}")
+            if is_checked:
                 if food not in st.session_state.shopping_list:
                     st.session_state.shopping_list.append(food)
-            col_b.write(f"**{food}** - *{reason}*")
-        
-        if st.button("Uložiť výber do nákupného zoznamu"):
-            st.success(f"Pridané do košíka: {', '.join(st.session_state.shopping_list)}")
+            else:
+                if food in st.session_state.shopping_list:
+                    st.session_state.shopping_list.remove(food)
+                    
+            col_b.markdown(f"🏷️ **[{category}]** **{food}** — *{benefit}*")
+            
+        st.write("")
+        if st.button("Uložiť nákupný výber", use_container_width=True):
+            st.success(f"Tvoj výber bol úspešne zaznamenaný. Máš uložených {len(st.session_state.shopping_list)} položiek.")
     else:
-        st.info("Momentálne nemáš žiadne výrazné deficity. Tu je zoznam 'superpotravín' pre tvoj typ diagnózy:")
-        # Tu by sme mohli vypísať všeobecné odporúčania podľa diagnóz
+        st.info("Na základe tvojho profilu nie sú vyžadované žiadne špecifické potraviny.")
+
+    # Visualize active cart
+    if 'shopping_list' in st.session_state and st.session_state.shopping_list:
+        st.divider()
+        st.subheader("🛒 Tvoj nákupný košík:")
+        
+        cart_cols = st.columns(3)
+        for idx, item in enumerate(st.session_state.shopping_list):
+            cart_cols[idx % 3].markdown(f"✅ **{item}**")
+            
+        st.write("")
+        if st.button("🗑️ Vyčistiť nákupný košík", use_container_width=True):
+            st.session_state.shopping_list = []
+            st.rerun()
