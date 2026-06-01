@@ -106,7 +106,7 @@ def render_diary_tab(df, meta_goal, target_cal, target_protein, target_carbs, ta
 
     bars_html = (
         '<div style="background:rgba(15,25,23,0.7);border:1px solid rgba(45,212,191,0.10);'
-        'border-radius:18px;padding:20px 24px;margin:12px 0;'>'
+        'border-radius:18px;padding:20px 24px;margin:12px 0;">'
         '<div style="font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;'
         'color:#6b8a85;margin-bottom:16px;">'
         + ("Denný pokrok" if get_lang() == "SK" else "Daily Progress") +
@@ -286,29 +286,29 @@ def render_diary_tab(df, meta_goal, target_cal, target_protein, target_carbs, ta
     gap = round(circ - dash, 1)
 
     metab_html = (
-        f'<div style="background:{m['grad']};border:1px solid {m['border']}33;'
-        f'border-left:4px solid {m['border']};border-radius:22px;'
-        f'padding:28px 32px;margin:16px 0;box-shadow:0 8px 32px rgba(0,0,0,0.28);'>
-        f'<div style="display:flex;align-items:center;gap:32px;">'
+        f"<div style=\"background:{m['grad']};border:1px solid {m['border']}33;\""
+        f"border-left:4px solid {m['border']};border-radius:22px;"
+        f"padding:28px 32px;margin:16px 0;box-shadow:0 8px 32px rgba(0,0,0,0.28);\">"
+        f"<div style=\"display:flex;align-items:center;gap:32px;\">"
         f'<div style="flex-shrink:0;text-align:center;">'
         f'<svg width="110" height="110" viewBox="0 0 110 110">'
         f'<circle cx="55" cy="55" r="{radius}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>'
-        f'<circle cx="55" cy="55" r="{radius}" fill="none" stroke="{m['score_color']}" stroke-width="10"'
-        f' stroke-dasharray="{dash} {gap}" stroke-dashoffset="{round(circ*0.25,1)}"'
-        f' stroke-linecap="round" style="filter:drop-shadow(0 0 6px {m['score_color']}88);"/>'
-        f'<text x="55" y="50" text-anchor="middle" fill="{m['score_color']}" '
-        f'font-size="22" font-weight="800" font-family="Inter,sans-serif">{metab_score}</text>'
+        f"<circle cx=\"55\" cy=\"55\" r=\"{radius}\" fill=\"none\" stroke=\"{m['score_color']}\" stroke-width=\"10\""
+        f" stroke-dasharray=\"{dash} {gap}\" stroke-dashoffset=\"{round(circ*0.25,1)}\""
+        f" stroke-linecap=\"round\" style=\"filter:drop-shadow(0 0 6px {m['score_color']}88);\"/>"
+        f"<text x=\"55\" y=\"50\" text-anchor=\"middle\" fill=\"{m['score_color']}\" "
+        f"font-size=\"22\" font-weight=\"800\" font-family=\"Inter,sans-serif\">{metab_score}</text>"
         f'<text x="55" y="66" text-anchor="middle" fill="#6b8a85" '
         f'font-size="9" font-family="Inter,sans-serif" letter-spacing="1">{score_label.upper()}</text>'
         f'</svg>'
         f'</div>'
         f'<div style="flex:1;">'
-        f'<div style="font-size:0.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;'
-        f'color:{m['score_color']};margin-bottom:6px;">🧬 ' +
+        f"<div style=\"font-size:0.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;\""
+        f"color:{m['score_color']};margin-bottom:6px;\">🧬 " +
         ("STAV METABOLIZMU" if lang == "SK" else "METABOLISM STATUS") +
         f'</div>'
         f'<div style="font-size:1.6rem;font-weight:800;color:#f0fdfa;line-height:1.2;margin-bottom:8px;">'
-        f'{m['icon']} {m_title}</div>'
+        f"{m['icon']} {m_title}</div>"
         f'<div style="font-size:0.92rem;color:#9fb7b3;line-height:1.6;">{m_sub}</div>'
         f'</div>'
         f'</div>'
