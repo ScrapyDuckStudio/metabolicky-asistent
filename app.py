@@ -26,47 +26,8 @@ def load_css(file_name):
 
 load_css("style.css")
 
-# ── Google auth — only activate when client_id is explicitly configured ──────
+# ── Google auth disabled — enable when credentials are configured ─────────────
 _auth_configured = False
-try:
-    client_id = st.secrets["auth"]["google"]["client_id"]
-    _auth_configured = bool(client_id and len(str(client_id)) > 10)
-except Exception:
-    _auth_configured = False
-
-if _auth_configured:
-    _logged_in = False
-    try:
-        _logged_in = bool(st.user.is_logged_in)
-    except Exception:
-        _logged_in = False
-
-    if not _logged_in:
-        _lang_pre = st.session_state.get("lang", "SK")
-        st.markdown("""
-<div style="background:linear-gradient(135deg,rgba(15,30,28,0.97),rgba(10,22,20,0.99));
-     border:1px solid rgba(45,212,191,0.18);border-radius:22px;
-     padding:48px 40px;max-width:480px;margin:80px auto;text-align:center;
-     box-shadow:0 16px 48px rgba(0,0,0,0.4);">
-  <div style="font-size:3rem;margin-bottom:16px;">🌿</div>
-  <div style="font-size:1.6rem;font-weight:800;color:#f0fdfa;margin-bottom:8px;">
-    Metabolický Asistent
-  </div>
-  <div style="font-size:0.9rem;color:#9fb7b3;margin-bottom:28px;">
-    Prihlás sa Google účtom — tvoje dáta sa synchronizujú na všetkých zariadeniach.<br>
-    <span style="font-size:0.82rem;color:#6b8a85;">Sign in with Google to sync your data across devices.</span>
-  </div>
-</div>""", unsafe_allow_html=True)
-        _, col_btn, _ = st.columns([1, 2, 1])
-        with col_btn:
-            st.login("google")
-        st.stop()
-    else:
-        try:
-            st.session_state["_user_email"] = st.user.email
-            st.session_state["_user_name"] = getattr(st.user, "name", st.user.email)
-        except Exception:
-            pass
 
 # ── App header ────────────────────────────────────────────────────────────────
 col1, col2 = st.columns([3, 1])
