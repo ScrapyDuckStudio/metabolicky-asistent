@@ -27,50 +27,12 @@ def load_css(file_name):
 load_css("style.css")
 
 # ── Google auth ───────────────────────────────────────────────────────────────
-# Reads credentials from Streamlit secrets — must have [auth.google] configured.
 _auth_configured = False
 try:
     _cid = st.secrets["auth"]["google"]["client_id"]
     _auth_configured = bool(_cid and str(_cid).endswith(".apps.googleusercontent.com"))
 except Exception:
     _auth_configured = False
-
-if _auth_configured:
-    _logged_in = False
-    try:
-        _logged_in = bool(st.user.is_logged_in)
-    except Exception:
-        pass
-
-    if not _logged_in:
-        lang_pre = st.session_state.get("lang", "SK")
-        signin_text = (
-            "Prihlás sa Google účtom — tvoje dáta sa synchronizujú na všetkých zariadeniach."
-            if lang_pre == "SK" else
-            "Sign in with Google — your data syncs across all your devices."
-        )
-        st.markdown(
-            f'<div style="background:linear-gradient(135deg,rgba(15,30,28,0.97),rgba(10,22,20,0.99));'
-            f'border:1px solid rgba(45,212,191,0.18);border-radius:22px;'
-            f'padding:48px 40px;max-width:480px;margin:80px auto;text-align:center;'
-            f'box-shadow:0 16px 48px rgba(0,0,0,0.4);">'
-            f'<div style="font-size:3rem;margin-bottom:16px;">🌿</div>'
-            f'<div style="font-size:1.6rem;font-weight:800;color:#f0fdfa;margin-bottom:8px;">'
-            f'Metabolický Asistent</div>'
-            f'<div style="font-size:0.9rem;color:#9fb7b3;margin-bottom:28px;">{signin_text}</div>'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
-        _, col_btn, _ = st.columns([1, 2, 1])
-        with col_btn:
-            st.login("google")
-        st.stop()
-    else:
-        try:
-            st.session_state["_user_email"] = st.user.email
-            st.session_state["_user_name"]  = getattr(st.user, "name", st.user.email)
-        except Exception:
-            pass
 
 # ── App header ────────────────────────────────────────────────────────────────
 col1, col2 = st.columns([3, 1])
