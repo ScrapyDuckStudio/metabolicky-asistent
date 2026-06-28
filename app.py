@@ -26,18 +26,18 @@ def load_css(file_name):
 
 load_css("style.css")
 
-# ── Google auth — only activate when secrets are configured ──────────────────
+# ── Google auth — only activate when client_id is explicitly configured ──────
 _auth_configured = False
 try:
-    _secrets_auth = st.secrets.get("auth", {})
-    _auth_configured = bool(_secrets_auth and _secrets_auth.get("google"))
+    client_id = st.secrets["auth"]["google"]["client_id"]
+    _auth_configured = bool(client_id and len(str(client_id)) > 10)
 except Exception:
     _auth_configured = False
 
 if _auth_configured:
     _logged_in = False
     try:
-        _logged_in = st.user.is_logged_in
+        _logged_in = bool(st.user.is_logged_in)
     except Exception:
         _logged_in = False
 
