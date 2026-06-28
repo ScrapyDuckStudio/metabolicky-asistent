@@ -50,7 +50,7 @@ df = sidebar_data["df"]
 tab1, tab2, tab3, tab4 = st.tabs(TRANSLATIONS[get_lang()]["tabs"])
 
 with tab1:
-    render_food_tab(df, health_conditions, sidebar_data)
+    render_food_tab(df, health_conditions)
 
 with tab2:
     render_diary_tab(
