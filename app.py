@@ -29,7 +29,8 @@ load_css("style.css")
 # ── Google auth ───────────────────────────────────────────────────────────────
 _auth_configured = False
 try:
-    _cid = st.secrets["auth"]["google"]["client_id"]
+    # Flat format: client_id lives directly under [auth], not [auth.google]
+    _cid = st.secrets["auth"]["client_id"]
     _auth_configured = bool(_cid and str(_cid).endswith(".apps.googleusercontent.com"))
 except Exception:
     _auth_configured = False
